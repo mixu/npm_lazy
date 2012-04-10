@@ -1,0 +1,11 @@
+{
+  "name": "npm-local",
+  "description": "Lazy local npm cache server",
+  "version": "0.0.1",
+  "dependencies": {
+    "http-proxy": ">=0.6.x"
+   },
+  "devDependencies": {
+    "mocha": "*"
+  }
+}
