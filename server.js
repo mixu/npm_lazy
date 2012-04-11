@@ -1,8 +1,10 @@
 var http = require('http'),
-    Server = require('./lib/server');
+    Server = require('./lib/server'),
+
+    config = require('./config.js');
 
 
 var server = http.createServer();
 
-Server.attach(server).listen(8080, 'localhost');
+Server.attach(server).listen(config.port, config.host);
 
