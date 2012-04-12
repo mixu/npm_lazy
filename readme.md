@@ -1,23 +1,30 @@
 # npm-lazy: a lazy local cache for NPM
 
-WIP!!!
-
 Use case: you have a bunch of servers that pull in dependencies as part of your deploy script from NPM.
 
 NPM is slow and can cause errors if you have many servers that access it at the same time.
 
 This server caches the NPM packages locally for local deployment. In the future, it may also do package distribution (maybe not?).
 
-## Lazy caching instead of replication
+## Key points
 
-Setting up full replication with CouchDB is overkill if all you want is a to keep a few dozen packages cached locally.
+- Lazy caching: no need to replicate or install CouchDB. npm-lazy packages and metadata. Since caching is lazy, you don't need to explicitly manage it. Just point npm on your deployment to the local npm-lazy server and it'll do the right thing.
+- Local cache for tarfiles: The response URLs for NPM packages are rewrittent on the fly so that npm will install them from npm-lazy.
+- Data is stored as files: everything gets put under ./db/ as JSON and tar files. No database to install or manage.
 
-npm-lazy caches metadata and package files, and only asks NPM about new versions if a long time (e.g. an hour) has passed. Since caching is lazy, you don't need to explicitly manage it. Just point npm on your deployment to the local npm-lazy server and it'll do the right thing and you'll have local copies of the npm packages.
+## Caching logic
 
-## No database dependencies
+When a resource is requested:
 
-Everything is stored in files: JSON text for metadata and tar files for the packages for minimal hassle.
+- Anything that we don't have locally gets fetched from registry.npmjs.org on demand.
+- Metadata is updated when the resource is requested the first time after a restart, and if the resource is requested an hour later (which is the max age for package metadata).
 
-## Resources are fetched locally
+## Using npm-lazy
 
-The response URLs for NPM packages are rewrittent on the fly so that npm will install them from npm-lazy.
+Start the server (node server.js), change config.js to set the port and external URL for npm-lazy.
+
+Point npm to npm-lazy:
+
+     npm config set registry http://localhost:8080/
+     
+
