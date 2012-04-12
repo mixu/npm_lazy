@@ -4,12 +4,12 @@ Use case: you have a bunch of servers that pull in dependencies as part of your 
 
 NPM is slow and can cause errors if you have many servers that access it at the same time.
 
-This server caches the NPM packages locally for local deployment. In the future, it may also do package distribution (maybe not?).
+This server caches the NPM packages locally for local deployment. 
 
 ## Key points
 
-- Lazy caching: no need to replicate or install CouchDB. npm-lazy packages and metadata. Since caching is lazy, you don't need to explicitly manage it. Just point npm on your deployment to the local npm-lazy server and it'll do the right thing.
-- Local cache for tarfiles: The response URLs for NPM packages are rewrittent on the fly so that npm will install them from npm-lazy.
+- Lazy caching: no need to replicate or install CouchDB. npm-lazy packages and metadata. Since caching is lazy, you don't need to explicitly manage it. Just point npm on your deployment to the local npm-lazy server and it'll do the right thing (see caching logic below).
+- Local cache for tarfiles: The response URLs for NPM packages are rewritten on the fly to refer to npm-lazy.
 - Data is stored as files: everything gets put under ./db/ as JSON and tar files. No database to install or manage.
 
 ## Caching logic
