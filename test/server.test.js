@@ -2,7 +2,7 @@ var http = require('http'),
     assert = require('assert'),
     EventEmitter = require('events').EventEmitter,
 
-    Client = require('../lib/client.js');
+    Client = require('../lib/client.js'),
     Server = require('../lib/server.js');
 
 var FakeCache = { },
