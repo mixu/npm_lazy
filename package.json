@@ -1,9 +1,11 @@
 {
-  "name": "npm-local",
+  "name": "npm-lazy",
   "description": "Lazy local npm cache server",
-  "version": "0.0.1",
+  "version": "0.0.2",
+  "main": "./lib/app.js",
   "dependencies": {
-    "mkdirp": "0.3.x"
+    "mkdirp": "0.3.x",
+    "mixu_minimal": "git://github.com/mixu/minimal.git#master"
    },
   "devDependencies": {
     "mocha": "*"

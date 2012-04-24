@@ -2,25 +2,16 @@ var http = require('http'),
     assert = require('assert'),
     EventEmitter = require('events').EventEmitter,
 
-    Client = require('../lib/client.js'),
-    Server = require('../lib/server.js');
-
-var FakeCache = { },
-    samplePackage = {
-      "name": "foo",
-      "version": "0.0.1",
-      "dist": {
-        "shasum": "fb65ff63e8e6c5be1b1663479b172391f2948fdb",
-        "tarball": "http://registry.npmjs.org/foo/-/foo-0.0.1.tgz"
-      }
-    };
+    Client = require('mixu_minimal').Client,
+    Server = require('../lib/app.js').Api,
+    config = require('./config.js');
 
 exports['given a server'] = {
 
   before: function(done) {
-    this.server = Server.attach(http.createServer());
-    Server.setBackend(FakeCache);
-    this.server.listen(9090, 'localhost', function() {
+    var server = http.createServer(function(req, res) {
+      api.route(req, res);
+    }).listen(9090, 'localhost', function() {
       done();
     });
   },
