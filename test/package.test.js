@@ -8,11 +8,11 @@ exports['given a package'] = {
 
   before: function(done) {
     var Cache = require('../lib/cache.js');
-    Cache.configure({
-      cacheDirectory: __dirname+'/db/',
+    Cache.configure({ cacheDirectory: __dirname+'/db/'});
+    Package.configure({
+      cache: Cache,
       externalUrl: 'http://localhost:8080'
     });
-    Package.setCache(Cache);
     done();
   },
 
