@@ -3,8 +3,13 @@ var http = require('http'),
     EventEmitter = require('events').EventEmitter,
 
     Client = require('mixu_minimal').Client,
-    Server = require('../lib/app.js').Api,
-    config = require('./config.js');
+    api = require('../lib/api.js'),
+    cache = require('../lib/cache.js'),
+    config = require('../config.js');
+
+var FakeCache = {};
+api.configure(config);
+cache.configure(config);
 
 exports['given a server'] = {
 
@@ -48,7 +53,7 @@ exports['given a server'] = {
         "shasum": "fb65ff63e8e6c5be1b1663479b172391f2948fdb",
         "tarball": "http://localhost:8080/foo/-/foo-0.0.1.tgz"
       }
-    }, Server.rewriteLocation(samplePackage));
+    }, api.rewriteLocation(samplePackage));
     done();
   }
 };

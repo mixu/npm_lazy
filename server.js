@@ -1,7 +1,7 @@
 var http = require('http'),
     app = require('./lib/app.js'),
     config = require('./config.js'),
-    api = app.Api;
+    api = require('./lib/api.js');
 
 app.configure(config);
 

@@ -5,7 +5,8 @@
   "main": "./lib/app.js",
   "dependencies": {
     "mkdirp": "0.3.x",
-    "mixu_minimal": "git://github.com/mixu/minimal.git#master"
+    "mixu_minimal": "git://github.com/mixu/minimal.git#master",
+    "semver": "1.0"
    },
   "devDependencies": {
     "mocha": "*"
