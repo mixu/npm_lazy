@@ -39,7 +39,15 @@ exports['given a cache'] = {
   },
 
   'can get a remote package': function(done) {
-    done();
+    this.timeout(20000); // npm is slow today
+    if(path.existsSync(__dirname+'/db/requireincontext/index.json')) {
+      fs.unlinkSync(__dirname+'/db/requireincontext/index.json');
+    }
+    Cache.get('requireincontext', 'index.json', function(err, data) {
+      // not really sure how I would mock this
+      assert.equal('requireincontext', data.name);
+      done();
+    });
   }
 };
 
