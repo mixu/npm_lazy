@@ -3,7 +3,7 @@ module.exports = {
   cacheDirectory: __dirname+'/db/',
   // maximum age before an index is refreshed from npm
   cacheAge: 60 * 60 * 1000,
-  // external url to npm-lazy, no trailing /
+  // external url to npm_lazy, no trailing /
   externalUrl: 'http://localhost:8080',
   // bind port and host
   port: 8080,

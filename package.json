@@ -1,5 +1,5 @@
 {
-  "name": "npm-lazy",
+  "name": "npm_lazy",
   "description": "Lazy local npm cache server",
   "version": "0.0.2",
   "main": "./lib/app.js",
