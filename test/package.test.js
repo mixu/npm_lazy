@@ -23,7 +23,6 @@ exports['given a package'] = {
         fs.readFileSync(__dirname+'/db/foo/index.json')
         .toString().replace('http://registry.npmjs.org/foo', 'http://localhost:8080/foo')
       );
-//      console.log(util.inspect(expected, null, 6), util.inspect(json, null, 6));
       assert.deepEqual(json, expected);
       done();
     });
@@ -38,7 +37,16 @@ exports['given a package'] = {
       assert.deepEqual(json, expected);
       done();
     });
+  },
+
+  'can check file sha': function(done) {
+    Package.checkFile(__dirname+'/fixtures/requireincontext/requireincontext-0.0.2.tgz', function(err, actual) {
+      assert.notEqual('4a77c6f7ccbd43e095d9fc6c943e53707e042f41', actual);
+      assert.equal('3bb7b8a676e95a33a0f28f081cf860176b8f67c7', actual);
+      done();
+    });
   }
+
 };
 
 // if this module is the script being run, then run the tests:

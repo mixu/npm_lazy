@@ -21,7 +21,7 @@ exports['given a cache'] = {
   },
 
   'can add a package': function(done) {
-    Cache.add('foobar', 'index.json', { msg: "hello world"}, function(err) {
+    Cache.add('foobar', 'index.json', JSON.stringify({ msg: "hello world"}), function(err) {
       done();
     });
   },
@@ -33,7 +33,7 @@ exports['given a cache'] = {
 
   'can get an existing package': function(done) {
     Cache.get('foobar', 'index.json', function(err, data) {
-      assert.deepEqual({ msg: 'hello world'}, data);
+      assert.deepEqual({ msg: 'hello world'}, JSON.parse(data.toString()));
       done();
     });
   },
@@ -44,6 +44,7 @@ exports['given a cache'] = {
       fs.unlinkSync(__dirname+'/db/requireincontext/index.json');
     }
     Cache.get('requireincontext', 'index.json', function(err, data) {
+      data = JSON.parse(data);
       // not really sure how I would mock this
       assert.equal('requireincontext', data.name);
       done();

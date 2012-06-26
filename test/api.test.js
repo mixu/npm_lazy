@@ -1,19 +1,26 @@
-var http = require('http'),
+var fs = require('fs'),
+    path = require('path'),
+    http = require('http'),
     assert = require('assert'),
-    EventEmitter = require('events').EventEmitter,
+    mkdirp = require('mkdirp'),
 
-    Client = require('mixu_minimal').Client,
     api = require('../lib/api.js'),
-    cache = require('../lib/cache.js'),
-    config = require('../config.js');
+    Cache = require('../lib/cache.js'),
+    Package = require('../lib/package.js'),
+
+    Client = require('mixu_minimal').Client;
 
 var FakeCache = {};
-api.configure(config);
-cache.configure(config);
 
 exports['given a server'] = {
 
   before: function(done) {
+    Cache.configure({ cacheDirectory: __dirname+'/db/' });
+    Package.configure({
+      cache: Cache,
+      externalUrl: 'http://localhost:9090'
+    });
+
     var server = http.createServer(function(req, res) {
       api.route(req, res);
     }).listen(9090, 'localhost', function() {
@@ -22,40 +29,51 @@ exports['given a server'] = {
   },
 
   'can GET a package index': function(done) {
-    FakeCache.getAll = function(pkg) {
-      assert.equal('package', pkg);
-      done();
-    };
     Client
-      .get('http://localhost:9090/package')
+      .get('http://localhost:9090/requireincontext')
       .end(function(err, data) {
         if (err) throw err;
+        done();
       });
   },
 
   'can GET a package version': function(done) {
-    FakeCache.getVersion = function(pkg, ver) {
-      assert.equal('package', pkg);
-      assert.equal('1.2.3', ver);
-      done();
-    };
     Client
-      .get('http://localhost:9090/package/1.2.3')
+      .get('http://localhost:9090/requireincontext/0.0.1')
       .end(function(err, data) {
         if (err) throw err;
+        done();
       });
   },
 
-  'can rewrite the package location': function(done) {
-    assert.deepEqual({
-      name: "foo", version: "0.0.1",
-      dist: {
-        "shasum": "fb65ff63e8e6c5be1b1663479b172391f2948fdb",
-        "tarball": "http://localhost:8080/foo/-/foo-0.0.1.tgz"
+  'can use npm install requireincontext': function(done) {
+    var tmpdir = __dirname+'/tmp/';
+    this.timeout(60000);
+    [ tmpdir + '/node_modules/requireincontext/index.js',
+      tmpdir + '/node_modules/requireincontext/package.json',
+      tmpdir + '/node_modules/requireincontext/readme.md'
+    ].forEach(function(p) {
+      if(path.existsSync(p)) {
+        fs.unlinkSync(p);
       }
-    }, api.rewriteLocation(samplePackage));
-    done();
+    });
+    mkdirp(tmpdir, function() {
+      console.log(tmpdir);
+      require('child_process')
+          .exec('npm --verbose --registry http://localhost:9090/ install',
+                { cwd: tmpdir },
+      function (error, stdout, stderr) {
+        console.log('stdout: ' + stdout);
+        console.log('stderr: ' + stderr);
+        if (error !== null) {
+          console.log('exec error: ' + error);
+          assert.ok(false);
+        }
+        done();
+      });
+    });
   }
+
 };
 
 // if this module is the script being run, then run the tests:
