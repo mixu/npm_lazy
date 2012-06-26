@@ -24,9 +24,29 @@ To temporarily set the registry:
 
     npm --registry http://localhost:8080/ install socket.io
 
-To permanently set the registry:
+To permanently set the registry via command line:
 
      npm config set registry http://localhost:8080/
+
+To permanently set the registry via config file, in ~/.npmrc:
+
+    registry = http://localhost:8080/
+
+For more info, see "npm help config" and "npm help registry".
+
+## Configuration
+
+    module.exports = {
+      // directory to store cached packages (full path)
+      cacheDirectory: __dirname+'/db/',
+      // maximum age before an index is refreshed from npm
+      cacheAge: 60 * 60 * 1000,
+      // external url to npm_lazy, no trailing /
+      externalUrl: 'http://localhost:8080',
+      // bind port and host
+      port: 8080,
+      host: 'localhost'
+    };
 
 ## Caching logic
 
