@@ -12,7 +12,7 @@ A lazy local cache for npm
 
 ## Installing
 
-    git clone git://github.com/mixu/npm_push.git
+    git clone git://github.com/mixu/npm_lazy.git
 
 Edit configuration in config.js (e.g. port and external URL) and start the server:
 
