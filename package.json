@@ -1,7 +1,7 @@
 {
   "name": "npm_lazy",
   "description": "Lazy local npm cache server",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "main": "./lib/app.js",
   "dependencies": {
     "mkdirp": "0.3.x",
