@@ -6,8 +6,11 @@
   "dependencies": {
     "mkdirp": "0.3.x",
     "mixu_minimal": "git://github.com/mixu/minimal.git#master",
-    "semver": "1.0"
-   },
+    "semver": "1.0",
+    "minilog": "~2.0.2",
+    "minitask": "0.0.1",
+    "rimraf": "~2.2.2"
+  },
   "devDependencies": {
     "mocha": "*"
   }

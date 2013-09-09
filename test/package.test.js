@@ -2,7 +2,8 @@ var fs = require('fs'),
     util = require('util'),
     assert = require('assert'),
 
-    Package = require('../lib/package.js');
+    Package = require('../lib/package.js'),
+    verify = require('../lib/verify.js');
 
 exports['given a package'] = {
 
@@ -40,7 +41,7 @@ exports['given a package'] = {
   },
 
   'can check file sha': function(done) {
-    Package.checkFile(__dirname+'/fixtures/requireincontext/requireincontext-0.0.2.tgz', function(err, actual) {
+    verify.check(__dirname+'/fixtures/requireincontext/requireincontext-0.0.2.tgz', function(err, actual) {
       assert.notEqual('4a77c6f7ccbd43e095d9fc6c943e53707e042f41', actual);
       assert.equal('3bb7b8a676e95a33a0f28f081cf860176b8f67c7', actual);
       done();
