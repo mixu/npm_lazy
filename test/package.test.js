@@ -19,7 +19,7 @@ exports['given a package'] = {
 
   'can fetch a package index': function(done) {
     this.timeout(10000);
-    Package.get('foo', function(err, json) {
+    Package.getIndex('foo', function(err, json) {
       var expected = JSON.parse(
         fs.readFileSync(__dirname+'/db/foo/index.json')
         .toString().replace('http://registry.npmjs.org/foo', 'http://localhost:8080/foo')
@@ -30,7 +30,7 @@ exports['given a package'] = {
   },
 
   'can fetch a specific version in the index': function(done) {
-    Package.get('foo', '1.0.0', function(err, json) {
+    Package.getVersion('foo', '1.0.0', function(err, json) {
       var expected = JSON.parse(
         fs.readFileSync(__dirname+'/db/foo/index.json')
           .toString().replace('http://registry.npmjs.org/foo', 'http://localhost:8080/foo')
