@@ -10,7 +10,16 @@ A lazy local cache for npm
 - Lazy caching: When a package is requested the first time, it is cached locally. No explicit need to manage packages or replication.
 - Metadata is expired periodically (default: 1 hour) so that the latest versions of packages are fetched.
 
-## Installing
+## New in version 1.x
+
+In response to the npm outage, I've made some improvements to npm_lazy. Previously, the primary use case was to prevent multiple servers in a large deploy from causing duplicate requests.
+
+The new setup is adds better caching support.
+
+- The caching logic now only discards the index when it has a newer version. Previously, we would discard the cached index file when it was too old. Now, the index is only discarded *after* a new version has been successfully fetched.
+- Failing tarfiles are retried. Previously, when a tarfile failed to pass the checksum we would just throw and require a restart. Now, the same fetch is retried multiple times.
+
+## Installation
 
     npm install npm_lazy
 

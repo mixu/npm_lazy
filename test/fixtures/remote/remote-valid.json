@@ -1,1 +1,12 @@
-{ "name": "remote-valid" }
+{
+  "name": "remote-valid",
+  "versions": {
+    "0.0.1": {
+      "name": "remote-valid",
+      "dist": {
+        "tarball": "http://foo/remote-valid.tgz",
+        "shasum": "92492a53d718200b02e5224e853dea0b0eebe7e4"
+      }
+    }
+  }
+ }

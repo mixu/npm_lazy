@@ -1,4 +1,6 @@
 var fs = require('fs'),
+    url = require('url'),
+    path = require('path'),
     assert = require('assert'),
     npmLazy = require('npm_lazy'),
     Resource = npmLazy.Resource,
@@ -20,34 +22,47 @@ exports['resource tests'] = {
     fs.readdirSync(localDir).forEach(function(basename) {
       var filename = localDir + '/' + basename,
           cachename = cache.filename(),
-          content = fs.readFileSync(filename);
+          content = fs.readFileSync(filename),
+          remotename = 'http://registry.npmjs.org/' + path.basename(basename, '.json');
 
-      console.log(filename, content.toString());
+      // console.log(remotename, filename, content.toString());
 
       fs.writeFileSync(cachename, content);
 
-      cache.complete(basename, 'GET', cachename);
+      // e.g. cache lookups should not have .json on their URLs
+      cache.complete(remotename, 'GET', cachename);
     });
 
     // change the _fetchTask
     Resource.prototype._fetchTask = function(onDone) {
-      console.log('fetch:', this.url);
+      var parts = url.parse(this.url),
+          target = path.basename(path.extname(parts.pathname) == '.tgz' ? parts.pathname : parts.pathname + '.json');
 
-      if(!fs.existsSync(remoteDir + '/' + this.url)) {
-        throw new Error('Path does not exist ' + remoteDir + '/' + this.url);
+      // console.log('remote-read:', this.url, 'from', target);
+
+      if(target == 'remote-retries.tgz') {
+        return onDone(new Error('Fake error'));
+      }
+
+      if(!fs.existsSync(remoteDir + '/' + target)) {
+        throw new Error('Path does not exist ' + remoteDir + '/' + target);
         return;
       }
 
       // special case remote-retry: should succeed on 3rd try
-      if(this.url == 'remote-retry.json' && this.retries == 3) {
+      if(target == 'remote-retry.json' && this.retries == 3) {
         // return remote-retry-valid.json
         return onDone(null, fs.createReadStream(remoteDir + '/remote-retry-valid.json'));
       }
+      if(target == 'remote-retry-3.tgz' && this.retries == 3) {
+        // return remote-retry-valid.json
+        return onDone(null, fs.createReadStream(remoteDir + '/remote-retry-3-valid.tgz'));
+      }
       // this works by reading the corresponding file from fixtures/remote
 
-      console.log(remoteDir + '/' + this.url);
+      // console.log(remoteDir + '/' + target);
 
-      return onDone(null, fs.createReadStream(remoteDir + '/' + this.url));
+      return onDone(null, fs.createReadStream(remoteDir + '/' + target));
     };
   },
 
@@ -63,7 +78,7 @@ exports['resource tests'] = {
   'index resource': {
 
     'if it exists and is up to date, success': function(done) {
-      var r = Resource.get('local-cached.json');
+      var r = Resource.get('http://registry.npmjs.org/local-cached');
 
       r.getReadableStream(function(err, data) {
         assert.ok(!err);
@@ -73,7 +88,7 @@ exports['resource tests'] = {
     },
 
     'if it does not exist and the response is a JSON object, success': function(done) {
-      var r = Resource.get('remote-valid.json');
+      var r = Resource.get('http://registry.npmjs.org/remote-valid');
 
       r.getReadableStream(function(err, data) {
         assert.ok(!err);
@@ -83,7 +98,7 @@ exports['resource tests'] = {
     },
 
     'if it does not exist and the response is not a JSON object, retry': function(done) {
-      var r = Resource.get('remote-retry.json');
+      var r = Resource.get('http://registry.npmjs.org/remote-retry');
 
       r.getReadableStream(function(err, data) {
         assert.ok(!err);
@@ -93,7 +108,7 @@ exports['resource tests'] = {
     },
 
     'if retries > maxRetries, throw a error': function(done) {
-      var r = Resource.get('remote-invalid.json');
+      var r = Resource.get('http://registry.npmjs.org/remote-invalid');
 
       r.getReadableStream(function(err, data) {
         assert.ok(err);
@@ -103,7 +118,7 @@ exports['resource tests'] = {
     },
 
     'if the resource exists but is outdated, fetch a new version and return it': function(done) {
-      var r = Resource.get('local-outdated.json');
+      var r = Resource.get('http://registry.npmjs.org/local-outdated');
 
       r.isUpToDate = function() { return false; };
       r.getReadableStream(function(err, data) {
@@ -114,7 +129,7 @@ exports['resource tests'] = {
     },
 
     'if the resource is outdated and the fetch fails, return the cached version': function(done) {
-      var r = Resource.get('local-outdated-fail.json');
+      var r = Resource.get('http://registry.npmjs.org/local-outdated-fail');
 
       r.isUpToDate = function() { return false; };
       r.getReadableStream(function(err, data) {
@@ -141,11 +156,11 @@ exports['resource tests'] = {
     }
 
   },
-/*
+
   'tar resource': {
 
     'if it exists, success': function(done) {
-      var r = Resource.get('remote-cached.tgz');
+      var r = Resource.get('http://registry.npmjs.org/remote-cached.tgz');
 
       r.getReadableStream(function(err, data) {
         assert.ok(!err);
@@ -155,25 +170,27 @@ exports['resource tests'] = {
     },
 
     'when the response passes checksum, success': function(done) {
-      var r = Resource.get('remote-valid.tgz');
+      var r = Resource.get('http://registry.npmjs.org/remote-valid.tgz');
 
       r.getReadableStream(function(err, data) {
         assert.ok(!err);
-        assert.equal(data, 'remote-valid-tar');
+        assert.equal(data.trim(), 'remote-valid-tar');
         done();
       });
     },
 
-    'when the response fails checksum, retry': function() {
+    'when the response fails checksum, retry': function(done) {
+      var r = Resource.get('http://registry.npmjs.org/remote-retry-3.tgz');
 
+      r.getReadableStream(function(err, data) {
+        assert.ok(!err);
+        assert.equal(data.trim(), 'remote-retry-valid-tar');
+        done();
+      });
     },
 
-    'if the fetch times out, and the object is not cached, throw': function() {
-
-    },
-
-    'if retries > maxRetries, throw a error': function() {
-      var r = Resource.get('remote-invalid.tgz');
+    'if retries > maxRetries, throw a error': function(done) {
+      var r = Resource.get('http://registry.npmjs.org/remote-retries.tgz');
 
       r.getReadableStream(function(err, data) {
         assert.ok(err);
@@ -182,17 +199,26 @@ exports['resource tests'] = {
       });
     },
 
-    'when the resource is already fetching, block all pending requests': function() {
+    'with granular control': {
+
+      'if the fetch times out, and the object is not cached, throw': function() {
+
+      },
+
+
+      'when the resource is already fetching, block all pending requests': function() {
+
+      }
 
     }
 
   }
-*/
+
 };
 
 // if this module is the script being run, then run the tests:
 if (module == require.main) {
-  var mocha = require('child_process').spawn('mocha', [ '--colors', '--ui', 'exports', '--reporter', 'spec', __filename ]);
+  var mocha = require('child_process').spawn('mocha', [ '--colors', '--ui', 'exports', '--bail',  '--reporter', 'spec', __filename ]);
   mocha.stdout.pipe(process.stdout);
   mocha.stderr.pipe(process.stderr);
 }
