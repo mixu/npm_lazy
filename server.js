@@ -6,12 +6,11 @@ var http = require('http'),
 
     config = require('./config.js');
 
-Cache.configure({
-    cacheDirectory: config.cacheDirectory,
-    cacheAge: config.cacheAge
-  });
+Resource.setCache(new Cache({ path: config.cacheDirectory }));
+Resource.setCacheAge(config.cacheAge);
+Resource.setMaxRetries(5);
+
 Package.configure({
-  cache: Cache,
   externalUrl: config.externalUrl
 });
 

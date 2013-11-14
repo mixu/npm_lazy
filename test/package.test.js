@@ -3,15 +3,19 @@ var fs = require('fs'),
     assert = require('assert'),
 
     Package = require('../lib/package.js'),
-    verify = require('../lib/verify.js');
+    verify = require('../lib/verify2.js'),
+    Cache = require('../lib/cache2.js'),
+    Resource = require('../lib/resource.js')
 
 exports['given a package'] = {
 
   before: function(done) {
-    var Cache = require('../lib/cache.js');
-    Cache.configure({ cacheDirectory: __dirname+'/db/'});
+    cache = new Cache({ path: __dirname + '/tmp' });
+    Resource.setCache(cache);
+
+    cache.clear();
+
     Package.configure({
-      cache: Cache,
       externalUrl: 'http://localhost:8080'
     });
     done();
@@ -21,7 +25,7 @@ exports['given a package'] = {
     this.timeout(10000);
     Package.getIndex('foo', function(err, json) {
       var expected = JSON.parse(
-        fs.readFileSync(__dirname+'/db/foo/index.json')
+        fs.readFileSync(__dirname+'/db/foo.json')
         .toString().replace('http://registry.npmjs.org/foo', 'http://localhost:8080/foo')
       );
       assert.deepEqual(json, expected);
@@ -32,12 +36,31 @@ exports['given a package'] = {
   'can fetch a specific version in the index': function(done) {
     Package.getVersion('foo', '1.0.0', function(err, json) {
       var expected = JSON.parse(
-        fs.readFileSync(__dirname+'/db/foo/index.json')
+        fs.readFileSync(__dirname+'/db/foo.json')
           .toString().replace('http://registry.npmjs.org/foo', 'http://localhost:8080/foo')
       ).versions["1.0.0"];
       assert.deepEqual(json, expected);
       done();
     });
+  },
+
+  'can fetch a tarfile': function(done) {
+    var out = __dirname + '/tmp/foo.tgz';
+    if(fs.existsSync(out)) {
+      fs.unlinkSync(out);
+    }
+    Resource.get('http://registry.npmjs.org/foo/-/foo-1.0.0.tgz')
+            .getReadableStream(function(err, readableStream) {
+              readableStream.pipe(
+                fs.createWriteStream(out)
+                .on('close', function() {
+                  verify.check(out, function(err, actual) {
+                    console.log(err, actual);
+                    done();
+                  });
+                })
+              );
+            });
   },
 
   'can check file sha': function(done) {

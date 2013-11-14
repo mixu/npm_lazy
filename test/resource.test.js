@@ -85,6 +85,10 @@ exports['resource tests'] = {
     assert.equal(Resource.get('http://foo/foo/').type, 'index');
   },
 
+  '.tgz get packagename': function() {
+    assert.equal(Resource.get('http://registry.npmjs.org/foo/-/foo-1.0.0.tgz').getPackageName(), 'foo');
+  },
+
   'index resource': {
 
     'if it exists and is up to date, success': function(done) {
@@ -234,7 +238,7 @@ exports['resource tests'] = {
   'tar resource': {
 
     'if it exists, success': function(done) {
-      var r = Resource.get('http://registry.npmjs.org/remote-cached.tgz');
+      var r = Resource.get('http://registry.npmjs.org/remote-cached/-/remote-cached.tgz');
 
       r.getReadableStream(function(err, data) {
         assert.ok(!err);
@@ -244,7 +248,7 @@ exports['resource tests'] = {
     },
 
     'when the response passes checksum, success': function(done) {
-      var r = Resource.get('http://registry.npmjs.org/remote-valid.tgz');
+      var r = Resource.get('http://registry.npmjs.org/remote-valid/-/remote-valid.tgz');
 
       r.getReadableStream(function(err, data) {
         assert.ok(!err);
@@ -254,7 +258,7 @@ exports['resource tests'] = {
     },
 
     'when the response fails checksum, retry': function(done) {
-      var r = Resource.get('http://registry.npmjs.org/remote-retry-3.tgz');
+      var r = Resource.get('http://registry.npmjs.org/remote-retry-3/-/remote-retry-3.tgz');
 
       r.getReadableStream(function(err, data) {
         assert.ok(!err);
@@ -264,7 +268,7 @@ exports['resource tests'] = {
     },
 
     'if retries > maxRetries, throw a error': function(done) {
-      var r = Resource.get('http://registry.npmjs.org/remote-retries.tgz');
+      var r = Resource.get('http://registry.npmjs.org/remote-retries/-/remote-retries.tgz');
 
       r.getReadableStream(function(err, data) {
         assert.ok(err);
@@ -286,7 +290,7 @@ exports['resource tests'] = {
 
       'if the fetch times out, and the object is not cached, throw': function(done) {
         this.timeout(10000);
-        var r = Resource.get('http://registry.npmjs.org/remote-missing.tgz'),
+        var r = Resource.get('http://registry.npmjs.org/remote-missing/-/remote-missing.tgz'),
             errors = [];
 
         r.on('fetch-error', function(err) {
@@ -311,8 +315,8 @@ exports['resource tests'] = {
           }, 50);
         };
 
-        var r = Resource.get('http://registry.npmjs.org/remote-valid2.tgz'),
-            r2 = Resource.get('http://registry.npmjs.org/remote-valid2.tgz'),
+        var r = Resource.get('http://registry.npmjs.org/remote-valid2/-/remote-valid2.tgz'),
+            r2 = Resource.get('http://registry.npmjs.org/remote-valid2/-/remote-valid2.tgz'),
             counter = 0;
 
         r.getReadableStream(onDone);
