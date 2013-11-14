@@ -6,14 +6,53 @@ var fs = require('fs'),
     Resource = npmLazy.Resource,
     Cache = require('../lib/cache2.js');
 
+var cache = new Cache({ path: __dirname + '/tmp' }),
+        remoteDir = __dirname + '/fixtures/remote',
+        localDir = __dirname + '/fixtures/local',
+        oldIsUpToDate;
+
+function getTargetBasename(uri) {
+  var parts = url.parse(uri);
+  return path.basename(path.extname(parts.pathname) == '.tgz' ? parts.pathname : parts.pathname + '.json');
+}
+
+function mockFetch(onDone) {
+  var target = getTargetBasename(this.url);
+
+  // console.log('remote-read:', this.url, 'from', target);
+
+  if(target == 'remote-retries.tgz') {
+    return onDone(new Error('Fake error'));
+  }
+
+  if(!fs.existsSync(remoteDir + '/' + target)) {
+    throw new Error('Path does not exist ' + remoteDir + '/' + target);
+    return;
+  }
+
+  // special case remote-retry: should succeed on 3rd try
+  if(target == 'remote-retry.json' && this.retries == 3) {
+    // return remote-retry-valid.json
+    return onDone(null, fs.createReadStream(remoteDir + '/remote-retry-valid.json'));
+  }
+  if(target == 'remote-retry-3.tgz' && this.retries == 3) {
+    // return remote-retry-valid.json
+    return onDone(null, fs.createReadStream(remoteDir + '/remote-retry-3-valid.tgz'));
+  }
+  // this works by reading the corresponding file from fixtures/remote
+
+  // console.log(remoteDir + '/' + target);
+
+  return onDone(null, fs.createReadStream(remoteDir + '/' + target));
+}
+
 exports['resource tests'] = {
 
   before: function() {
 
+    cache.clear();
+
     // fixture setup
-    var cache = new Cache({ path: __dirname + '/tmp' }),
-        remoteDir = __dirname + '/fixtures/remote',
-        localDir = __dirname + '/fixtures/local';
     Resource.setCache(cache);
 
     // for each file in fixtures/local, store them in the cache
@@ -34,36 +73,7 @@ exports['resource tests'] = {
     });
 
     // change the _fetchTask
-    Resource.prototype._fetchTask = function(onDone) {
-      var parts = url.parse(this.url),
-          target = path.basename(path.extname(parts.pathname) == '.tgz' ? parts.pathname : parts.pathname + '.json');
-
-      // console.log('remote-read:', this.url, 'from', target);
-
-      if(target == 'remote-retries.tgz') {
-        return onDone(new Error('Fake error'));
-      }
-
-      if(!fs.existsSync(remoteDir + '/' + target)) {
-        throw new Error('Path does not exist ' + remoteDir + '/' + target);
-        return;
-      }
-
-      // special case remote-retry: should succeed on 3rd try
-      if(target == 'remote-retry.json' && this.retries == 3) {
-        // return remote-retry-valid.json
-        return onDone(null, fs.createReadStream(remoteDir + '/remote-retry-valid.json'));
-      }
-      if(target == 'remote-retry-3.tgz' && this.retries == 3) {
-        // return remote-retry-valid.json
-        return onDone(null, fs.createReadStream(remoteDir + '/remote-retry-3-valid.tgz'));
-      }
-      // this works by reading the corresponding file from fixtures/remote
-
-      // console.log(remoteDir + '/' + target);
-
-      return onDone(null, fs.createReadStream(remoteDir + '/' + target));
-    };
+    Resource.prototype._fetchTask = mockFetch;
   },
 
   'Resource.get() will only return a single instance for a given url': function() {
@@ -141,16 +151,80 @@ exports['resource tests'] = {
 
     'with granular control': {
 
-      'if the fetch times out, use the cached version': function() {
-
+      before: function() {
+        Resource.prototype._fetchTask = function() { };
+        oldIsUpToDate = Resource.prototype.isUpToDate;
+        Resource.prototype.isUpToDate = function() {
+          return false;
+        };
       },
 
-      'if the fetch times out, and the object is not cached, throw': function() {
-
+      after: function() {
+        Resource.prototype._fetchTask = mockFetch;
+        Resource.prototype.isUpToDate = oldIsUpToDate;
       },
 
-      'when the resource is already fetching, block all pending requests': function() {
+      'if the fetch times out, use the cached version': function(done) {
+        this.timeout(10000);
+        var r = Resource.get('http://registry.npmjs.org/local-cached'),
+            errors = [];
 
+        r.on('fetch-error', function(err) {
+          // console.log(err);
+          errors.push(err);
+        });
+        r.timeout = 10;
+
+        r.getReadableStream(function(err, data) {
+          assert.ok(!err);
+          assert.equal(errors.length, 3);
+          assert.equal(JSON.parse(data).name, 'local-cached');
+          done();
+        });
+      },
+
+      'if the fetch times out, and the object is not cached, throw': function(done) {
+        this.timeout(10000);
+        var r = Resource.get('http://registry.npmjs.org/local-missing'),
+            errors = [];
+
+        r.on('fetch-error', function(err) {
+          // console.log(err);
+          errors.push(err);
+        });
+        r.timeout = 10;
+
+        r.getReadableStream(function(err, data) {
+          assert.ok(err);
+          assert.ok(!data);
+          done();
+        });
+      },
+
+      'when the resource is already fetching, block all pending requests': function(done) {
+        this.timeout(10000);
+        Resource.prototype._fetchTask = function(onDone) {
+          var u = this.url;
+          setTimeout(function() {
+            onDone(null, fs.createReadStream(remoteDir + '/' + getTargetBasename(u)));
+          }, 50);
+        };
+
+        var r = Resource.get('http://registry.npmjs.org/remote-valid'),
+            r2 = Resource.get('http://registry.npmjs.org/remote-valid'),
+            counter = 0;
+
+        r.getReadableStream(onDone);
+        r2.getReadableStream(onDone);
+
+        function onDone(err, data) {
+          assert.ok(!err);
+          assert.equal(JSON.parse(data).name, 'remote-valid');
+          counter++;
+          if(counter == 2) {
+            done();
+          }
+        }
       }
 
     }
@@ -201,13 +275,57 @@ exports['resource tests'] = {
 
     'with granular control': {
 
-      'if the fetch times out, and the object is not cached, throw': function() {
-
+      before: function() {
+        Resource.prototype._fetchTask = function() { };
+        oldIsUpToDate = Resource.prototype.isUpToDate;
       },
 
+      after: function() {
+        Resource.prototype._fetchTask = mockFetch;
+      },
 
-      'when the resource is already fetching, block all pending requests': function() {
+      'if the fetch times out, and the object is not cached, throw': function(done) {
+        this.timeout(10000);
+        var r = Resource.get('http://registry.npmjs.org/remote-missing.tgz'),
+            errors = [];
 
+        r.on('fetch-error', function(err) {
+          console.log(err);
+          errors.push(err);
+        });
+        r.timeout = 10;
+
+        r.getReadableStream(function(err, data) {
+          assert.ok(err);
+          assert.ok(!data);
+          done();
+        });
+      },
+
+      'when the resource is already fetching, block all pending requests': function(done) {
+        this.timeout(10000);
+        Resource.prototype._fetchTask = function(onDone) {
+          var u = this.url;
+          setTimeout(function() {
+            onDone(null, fs.createReadStream(remoteDir + '/' + getTargetBasename(u)));
+          }, 50);
+        };
+
+        var r = Resource.get('http://registry.npmjs.org/remote-valid2.tgz'),
+            r2 = Resource.get('http://registry.npmjs.org/remote-valid2.tgz'),
+            counter = 0;
+
+        r.getReadableStream(onDone);
+        r2.getReadableStream(onDone);
+
+        function onDone(err, data) {
+          assert.ok(!err);
+          assert.equal(data.trim(), 'remote-valid-tar');
+          counter++;
+          if(counter == 2) {
+            done();
+          }
+        }
       }
 
     }
