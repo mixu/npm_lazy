@@ -1,9 +1,9 @@
 var http = require('http'),
 
     api = require('./lib/api.js'),
-    Cache = require('./lib/cache.js'),
+    Cache = require('./lib/cache2.js'),
     Package = require('./lib/package.js'),
-
+    Resource = require('./lib/resource.js'),
     config = require('./config.js');
 
 Resource.setCache(new Cache({ path: config.cacheDirectory }));

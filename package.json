@@ -9,7 +9,8 @@
     "semver": "1.0",
     "minilog": "~2.0.2",
     "minitask": "0.0.1",
-    "rimraf": "~2.2.2"
+    "rimraf": "~2.2.2",
+    "microee": "0.0.2"
   },
   "devDependencies": {
     "mocha": "*"
