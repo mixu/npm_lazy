@@ -17,16 +17,17 @@ function getTargetBasename(uri) {
 }
 
 function mockFetch(onDone) {
-  var target = getTargetBasename(this.url);
+  var target = getTargetBasename(this.url),
+      targetPath = remoteDir + '/' + target;
 
-  // console.log('remote-read:', this.url, 'from', target);
+  // console.log('remote-read:', this.url, 'from', targetPath);
 
   if(target == 'remote-retries.tgz') {
     return onDone(new Error('Fake error'));
   }
 
-  if(!fs.existsSync(remoteDir + '/' + target)) {
-    throw new Error('Path does not exist ' + remoteDir + '/' + target);
+  if(!fs.existsSync(targetPath)) {
+    throw new Error('Path does not exist ' + targetPath);
     return;
   }
 
@@ -43,7 +44,7 @@ function mockFetch(onDone) {
 
   // console.log(remoteDir + '/' + target);
 
-  return onDone(null, fs.createReadStream(remoteDir + '/' + target));
+  return onDone(null, fs.createReadStream(targetPath));
 }
 
 exports['resource tests'] = {
@@ -62,9 +63,18 @@ exports['resource tests'] = {
       var filename = localDir + '/' + basename,
           cachename = cache.filename(),
           content = fs.readFileSync(filename),
-          remotename = 'http://registry.npmjs.org/' + path.basename(basename, '.json');
+          // exclude the extension from the package name
+          packagename = basename.substr(0, basename.length - path.extname(basename).length),
+          remotename;
 
-      // console.log(remotename, filename, content.toString());
+      if(path.extname(basename) === '.json') {
+        remotename = 'http://registry.npmjs.org/' + packagename;
+      } else {
+        remotename = 'http://registry.npmjs.org/' +
+          packagename + '/-/' + basename;
+      }
+
+      // console.log(path.relative(__dirname, filename), '\tcached locally as', remotename);
 
       fs.writeFileSync(cachename, content);
 

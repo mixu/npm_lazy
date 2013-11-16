@@ -5,8 +5,9 @@ var fs = require('fs'),
     mkdirp = require('mkdirp'),
 
     api = require('../lib/api.js'),
-    Cache = require('../lib/cache.js'),
+    Cache = require('../lib/cache2.js'),
     Package = require('../lib/package.js'),
+    Resource = require('../lib/resource.js'),
 
     Client = require('mixu_minimal').Client;
 
@@ -15,9 +16,8 @@ var FakeCache = {};
 exports['given a server'] = {
 
   before: function(done) {
-    Cache.configure({ cacheDirectory: __dirname+'/db/' });
+    Resource.setCache(new Cache({ path: __dirname + '/db/' }));
     Package.configure({
-      cache: Cache,
       externalUrl: 'http://localhost:9090'
     });
 
@@ -29,20 +29,36 @@ exports['given a server'] = {
   },
 
   'can GET a package index': function(done) {
+    this.timeout(60000); // because I'm tethering
     Client
       .get('http://localhost:9090/requireincontext')
-      .end(function(err, data) {
+      .end(function(err, res) {
         if (err) throw err;
-        done();
+        var data = '';
+        res.on('data', function(c) {
+          data += c;
+        });
+        res.on('end', function() {
+          assert.ok(typeof JSON.parse(data) === 'object');
+          done();
+        });
       });
   },
 
   'can GET a package version': function(done) {
+    this.timeout(60000);
     Client
       .get('http://localhost:9090/requireincontext/0.0.1')
-      .end(function(err, data) {
+      .end(function(err, res) {
         if (err) throw err;
-        done();
+        var data = '';
+        res.on('data', function(c) {
+          data += c;
+        });
+        res.on('end', function() {
+          assert.ok(typeof JSON.parse(data) === 'object');
+          done();
+        });
       });
   },
 
@@ -53,7 +69,7 @@ exports['given a server'] = {
       tmpdir + '/node_modules/requireincontext/package.json',
       tmpdir + '/node_modules/requireincontext/readme.md'
     ].forEach(function(p) {
-      if(path.existsSync(p)) {
+      if(fs.existsSync(p)) {
         fs.unlinkSync(p);
       }
     });
