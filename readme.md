@@ -12,14 +12,29 @@ A lazy local cache for npm
 
 ## New in version 1.x
 
-NOTE: coming soon, current stable is 0.x
-
 In response to the npm outage, I've made some improvements to npm_lazy. Previously, the primary use case was to prevent multiple servers in a large deploy from causing duplicate requests.
 
 The new setup is adds better caching support.
 
-- The caching logic now only discards the index when it has a newer version. Previously, we would discard the cached index file when it was too old. Now, the index is only discarded *after* a new version has been successfully fetched.
-- Failing tarfiles are retried. Previously, when a tarfile failed to pass the checksum we would just throw and require a restart. Now, the same fetch is retried multiple times.
+### Resilient to registry failures (new in 1.x!)
+
+First, install a package successfully so that it is cached.
+
+Next, to simulate a network failure, add `0.0.0.1 registry.npmjs.org` to `/etc/hosts` and try installing that same package again (in another folder). You should see something like this:
+
+    npm_lazy at localhost port 8080
+    Fetch failed (1/5): http://registry.npmjs.org/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
+    Fetch failed (2/5): http://registry.npmjs.org/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
+    Fetch failed (3/5): http://registry.npmjs.org/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
+    Fetch failed (4/5): http://registry.npmjs.org/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
+    Fetch failed (5/5): http://registry.npmjs.org/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
+    [OK] Reusing cached result for http://registry.npmjs.org/socket.io
+
+Tarfiles are cached forever, because they are checksummed. Tarfiles are retried if the initial checksum fails for up to five times.
+
+For index files (e.g. JSON metadata), we will attempt to contact the registry first if the age of the file is older than `cacheAge`.
+
+If contacting the registry fails, then the old version of the metadata is sent instead. This means that even when outages occur, you can install any package that has been installed at least once before.
 
 ## Installation
 

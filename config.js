@@ -5,6 +5,8 @@ module.exports = {
   cacheAge: 60 * 60 * 1000,
   // external url to npm_lazy, no trailing /
   externalUrl: 'http://localhost:8080',
+  // with trailing /
+  remoteUrl: 'http://registry.npmjs.org/',
   // bind port and host
   port: 8080,
   host: 'localhost'

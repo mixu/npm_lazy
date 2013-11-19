@@ -11,7 +11,8 @@ Resource.setCacheAge(config.cacheAge);
 Resource.setMaxRetries(5);
 
 Package.configure({
-  externalUrl: config.externalUrl
+  externalUrl: config.externalUrl,
+  remoteUrl: config.remoteUrl
 });
 
 var server = http.createServer();
