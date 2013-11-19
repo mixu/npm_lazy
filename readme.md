@@ -6,6 +6,7 @@ A lazy local cache for npm
 
 - npm can be slow, down or return random errors if you have large deploys
 - npm_lazy caches packages on your local network, making things faster and more predictable
+- If 100 servers request the same package metadata at the same time, npm_lazy makes sure that (at most) only one request goes out to the npm registry.
 - No database to install, replicate or manage. Data is stored under ./db/ as JSON and tar files.
 - Lazy caching: When a package is requested the first time, it is cached locally. No explicit need to manage packages or replication.
 - Metadata is expired periodically (default: 1 hour) so that the latest versions of packages are fetched.
@@ -30,11 +31,14 @@ Next, to simulate a network failure, add `0.0.0.1 registry.npmjs.org` to `/etc/h
     Fetch failed (5/5): http://registry.npmjs.org/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
     [OK] Reusing cached result for http://registry.npmjs.org/socket.io
 
-Tarfiles are cached forever, because they are checksummed. Tarfiles are retried if the initial checksum fails for up to five times.
+Here are all the ways in which npm_lazy is resilient to registry failures:
 
-For index files (e.g. JSON metadata), we will attempt to contact the registry first if the age of the file is older than `cacheAge`.
-
-If contacting the registry fails, then the old version of the metadata is sent instead. This means that even when outages occur, you can install any package that has been installed at least once before.
+- All HTTP requests are retried up to a configurable number (default: 5 times).
+- All HTTP requests are subject to a maximum fetch timeout (default: 5000 ms). If this fails, the request is retried (or failed).
+- Invalid responses are rejected and retried:
+  - Tarfiles are checked against the expected shasum, and cached forever if they match; if not, they are retried.
+  - Metadata files must parse as JSON; if not, they are retried.
+- Metadata files are never discarded until a newer version can be fetched successfully. If the JSON metadata is older than `cacheAge` (default: 1 hour), we will attempt to contact the registry first. However, if contacting the registry fails, then the old version of the metadata is sent instead. This means that even when outages occur, you can install any package that has been installed at least once before.
 
 ## Installation
 
