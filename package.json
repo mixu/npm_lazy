@@ -2,16 +2,21 @@
   "name": "npm_lazy",
   "description": "Lazy local npm cache server",
   "version": "1.0.0",
-  "main": "./lib/app.js",
+  "main": "./server.js",
   "dependencies": {
     "mkdirp": "0.3.x",
-    "mixu_minimal": "git://github.com/mixu/minimal.git#master",
     "semver": "1.0",
     "minilog": "~2.0.2",
     "minitask": "0.0.1",
     "rimraf": "~2.2.2",
-    "microee": "0.0.2"
+    "microee": "0.0.2",
+    "mixu_minimal": "0.0.1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mixu/npm_lazy.git"
+  },
+  "license": "BSD",
   "devDependencies": {
     "mocha": "*"
   }
