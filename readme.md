@@ -15,7 +15,7 @@ A lazy local cache for npm
 
 In response to the npm outage, I've made some improvements to npm_lazy. Previously, the primary use case was to prevent multiple servers in a large deploy from causing duplicate requests.
 
-The new setup is adds better caching support.
+The new version adds better caching support and resiliency to registry failures.
 
 ### Resilient to registry failures (new in 1.x!)
 
