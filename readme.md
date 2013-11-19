@@ -40,6 +40,8 @@ If contacting the registry fails, then the old version of the metadata is sent i
 
     npm install npm_lazy
 
+Or: `git clone git@github.com:mixu/npm_lazy.git && cd npm_lazy && npm install`.
+
 Edit configuration in config.js (e.g. port and external URL) and start the server:
 
     node server.js
@@ -62,13 +64,29 @@ For more info, see "npm help config" and "npm help registry".
 
 ## Configuration
 
+Configured by editing `config.js` in the same directory:
+
     module.exports = {
+      // Cache config
+
       // directory to store cached packages (full path)
       cacheDirectory: __dirname+'/db/',
       // maximum age before an index is refreshed from npm
       cacheAge: 60 * 60 * 1000,
+
+      // Request config
+
+      // max milliseconds to wait for each HTTP response
+      httpTimeout: 5000,
+      // maximum number of retries per HTTP resource to get
+      maxRetries: 5,
+
+      // Remote and local URL
+
       // external url to npm_lazy, no trailing /
       externalUrl: 'http://localhost:8080',
+      // registry url with trailing /
+      remoteUrl: 'http://registry.npmjs.org/',
       // bind port and host
       port: 8080,
       host: 'localhost'

@@ -8,7 +8,8 @@ var http = require('http'),
 
 Resource.setCache(new Cache({ path: config.cacheDirectory }));
 Resource.setCacheAge(config.cacheAge);
-Resource.setMaxRetries(5);
+Resource.setMaxRetries(config.maxRetries);
+Resource.setTimeout(config.httpTimeout);
 
 Package.configure({
   externalUrl: config.externalUrl,

@@ -178,11 +178,13 @@ exports['resource tests'] = {
         Resource.prototype.isUpToDate = function() {
           return false;
         };
+        Resource.setTimeout(10);
       },
 
       after: function() {
         Resource.prototype._fetchTask = mockFetch;
         Resource.prototype.isUpToDate = oldIsUpToDate;
+        Resource.setTimeout(2000);
       },
 
       'if the fetch times out, use the cached version': function(done) {
@@ -194,7 +196,6 @@ exports['resource tests'] = {
           // console.log(err);
           errors.push(err);
         });
-        r.timeout = 10;
 
         r.getReadablePath(function(err, data) {
           assert.ok(!err);
@@ -213,7 +214,6 @@ exports['resource tests'] = {
           // console.log(err);
           errors.push(err);
         });
-        r.timeout = 10;
 
         r.getReadablePath(function(err, data) {
           assert.ok(err);
@@ -299,10 +299,12 @@ exports['resource tests'] = {
       before: function() {
         Resource.prototype._fetchTask = function() { };
         oldIsUpToDate = Resource.prototype.isUpToDate;
+        Resource.setTimeout(10);
       },
 
       after: function() {
         Resource.prototype._fetchTask = mockFetch;
+        Resource.setTimeout(2000);
       },
 
       'if the fetch times out, and the object is not cached, throw': function(done) {
@@ -314,7 +316,6 @@ exports['resource tests'] = {
           console.log(err);
           errors.push(err);
         });
-        r.timeout = 10;
 
         r.getReadablePath(function(err, data) {
           assert.ok(err);
