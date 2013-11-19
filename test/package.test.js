@@ -50,8 +50,8 @@ exports['given a package'] = {
       fs.unlinkSync(out);
     }
     Resource.get('http://registry.npmjs.org/foo/-/foo-1.0.0.tgz')
-            .getReadableStream(function(err, readableStream) {
-              readableStream.pipe(
+            .getReadablePath(function(err, fullpath) {
+              fs.createReadStream(fullpath).pipe(
                 fs.createWriteStream(out)
                 .on('close', function() {
                   verify.check(out, function(err, actual) {

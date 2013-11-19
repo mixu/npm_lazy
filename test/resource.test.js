@@ -6,7 +6,7 @@ var fs = require('fs'),
     Resource = npmLazy.Resource,
     Cache = require('../lib/cache2.js');
 
-var cache = new Cache({ path: __dirname + '/tmp' }),
+var cache = new Cache({ path: __dirname + '/db' }),
         remoteDir = __dirname + '/fixtures/remote',
         localDir = __dirname + '/fixtures/local',
         oldIsUpToDate;
@@ -45,6 +45,13 @@ function mockFetch(onDone) {
   // console.log(remoteDir + '/' + target);
 
   return onDone(null, fs.createReadStream(targetPath));
+}
+
+function read(fullpath) {
+  if(!fullpath) {
+    return fullpath;
+  }
+  return fs.readFileSync(fullpath).toString();
 }
 
 exports['resource tests'] = {
@@ -104,9 +111,9 @@ exports['resource tests'] = {
     'if it exists and is up to date, success': function(done) {
       var r = Resource.get('http://registry.npmjs.org/local-cached');
 
-      r.getReadableStream(function(err, data) {
+      r.getReadablePath(function(err, data) {
         assert.ok(!err);
-        assert.equal(JSON.parse(data).name, 'local-cached');
+        assert.equal(JSON.parse(read(data)).name, 'local-cached');
         done();
       });
     },
@@ -114,9 +121,9 @@ exports['resource tests'] = {
     'if it does not exist and the response is a JSON object, success': function(done) {
       var r = Resource.get('http://registry.npmjs.org/remote-valid');
 
-      r.getReadableStream(function(err, data) {
+      r.getReadablePath(function(err, data) {
         assert.ok(!err);
-        assert.equal(JSON.parse(data).name, 'remote-valid');
+        assert.equal(JSON.parse(read(data)).name, 'remote-valid');
         done();
       });
     },
@@ -124,9 +131,9 @@ exports['resource tests'] = {
     'if it does not exist and the response is not a JSON object, retry': function(done) {
       var r = Resource.get('http://registry.npmjs.org/remote-retry');
 
-      r.getReadableStream(function(err, data) {
+      r.getReadablePath(function(err, data) {
         assert.ok(!err);
-        assert.equal(JSON.parse(data).name, 'remote-retry');
+        assert.equal(JSON.parse(read(data)).name, 'remote-retry');
         done();
       });
     },
@@ -134,9 +141,9 @@ exports['resource tests'] = {
     'if retries > maxRetries, throw a error': function(done) {
       var r = Resource.get('http://registry.npmjs.org/remote-invalid');
 
-      r.getReadableStream(function(err, data) {
+      r.getReadablePath(function(err, data) {
         assert.ok(err);
-        assert.ok(!data);
+        assert.ok(!read(data));
         done();
       });
     },
@@ -145,9 +152,9 @@ exports['resource tests'] = {
       var r = Resource.get('http://registry.npmjs.org/local-outdated');
 
       r.isUpToDate = function() { return false; };
-      r.getReadableStream(function(err, data) {
+      r.getReadablePath(function(err, data) {
         assert.ok(!err);
-        assert.equal(JSON.parse(data).name, 'uptodate');
+        assert.equal(JSON.parse(read(data)).name, 'uptodate');
         done();
       });
     },
@@ -156,9 +163,9 @@ exports['resource tests'] = {
       var r = Resource.get('http://registry.npmjs.org/local-outdated-fail');
 
       r.isUpToDate = function() { return false; };
-      r.getReadableStream(function(err, data) {
+      r.getReadablePath(function(err, data) {
         assert.ok(!err);
-        assert.equal(JSON.parse(data).name, 'outdated-fail');
+        assert.equal(JSON.parse(read(data)).name, 'outdated-fail');
         done();
       });
     },
@@ -189,10 +196,10 @@ exports['resource tests'] = {
         });
         r.timeout = 10;
 
-        r.getReadableStream(function(err, data) {
+        r.getReadablePath(function(err, data) {
           assert.ok(!err);
           assert.equal(errors.length, 3);
-          assert.equal(JSON.parse(data).name, 'local-cached');
+          assert.equal(JSON.parse(read(data)).name, 'local-cached');
           done();
         });
       },
@@ -208,9 +215,9 @@ exports['resource tests'] = {
         });
         r.timeout = 10;
 
-        r.getReadableStream(function(err, data) {
+        r.getReadablePath(function(err, data) {
           assert.ok(err);
-          assert.ok(!data);
+          assert.ok(!read(data));
           done();
         });
       },
@@ -228,12 +235,12 @@ exports['resource tests'] = {
             r2 = Resource.get('http://registry.npmjs.org/remote-valid'),
             counter = 0;
 
-        r.getReadableStream(onDone);
-        r2.getReadableStream(onDone);
+        r.getReadablePath(onDone);
+        r2.getReadablePath(onDone);
 
         function onDone(err, data) {
           assert.ok(!err);
-          assert.equal(JSON.parse(data).name, 'remote-valid');
+          assert.equal(JSON.parse(read(data)).name, 'remote-valid');
           counter++;
           if(counter == 2) {
             done();
@@ -250,9 +257,9 @@ exports['resource tests'] = {
     'if it exists, success': function(done) {
       var r = Resource.get('http://registry.npmjs.org/remote-cached/-/remote-cached.tgz');
 
-      r.getReadableStream(function(err, data) {
+      r.getReadablePath(function(err, data) {
         assert.ok(!err);
-        assert.equal(data, 'remote-cached-tar');
+        assert.equal(read(data), 'remote-cached-tar');
         done();
       });
     },
@@ -260,9 +267,9 @@ exports['resource tests'] = {
     'when the response passes checksum, success': function(done) {
       var r = Resource.get('http://registry.npmjs.org/remote-valid/-/remote-valid.tgz');
 
-      r.getReadableStream(function(err, data) {
+      r.getReadablePath(function(err, data) {
         assert.ok(!err);
-        assert.equal(data.trim(), 'remote-valid-tar');
+        assert.equal(read(data).trim(), 'remote-valid-tar');
         done();
       });
     },
@@ -270,9 +277,9 @@ exports['resource tests'] = {
     'when the response fails checksum, retry': function(done) {
       var r = Resource.get('http://registry.npmjs.org/remote-retry-3/-/remote-retry-3.tgz');
 
-      r.getReadableStream(function(err, data) {
+      r.getReadablePath(function(err, data) {
         assert.ok(!err);
-        assert.equal(data.trim(), 'remote-retry-valid-tar');
+        assert.equal(read(data).trim(), 'remote-retry-valid-tar');
         done();
       });
     },
@@ -280,9 +287,9 @@ exports['resource tests'] = {
     'if retries > maxRetries, throw a error': function(done) {
       var r = Resource.get('http://registry.npmjs.org/remote-retries/-/remote-retries.tgz');
 
-      r.getReadableStream(function(err, data) {
+      r.getReadablePath(function(err, data) {
         assert.ok(err);
-        assert.ok(!data);
+        assert.ok(!read(data));
         done();
       });
     },
@@ -309,9 +316,9 @@ exports['resource tests'] = {
         });
         r.timeout = 10;
 
-        r.getReadableStream(function(err, data) {
+        r.getReadablePath(function(err, data) {
           assert.ok(err);
-          assert.ok(!data);
+          assert.ok(!read(data));
           done();
         });
       },
@@ -329,12 +336,12 @@ exports['resource tests'] = {
             r2 = Resource.get('http://registry.npmjs.org/remote-valid2/-/remote-valid2.tgz'),
             counter = 0;
 
-        r.getReadableStream(onDone);
-        r2.getReadableStream(onDone);
+        r.getReadablePath(onDone);
+        r2.getReadablePath(onDone);
 
         function onDone(err, data) {
           assert.ok(!err);
-          assert.equal(data.trim(), 'remote-valid-tar');
+          assert.equal(read(data).trim(), 'remote-valid-tar');
           counter++;
           if(counter == 2) {
             done();
