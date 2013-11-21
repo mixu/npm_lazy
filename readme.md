@@ -84,6 +84,9 @@ Configured by editing `config.js` in the same directory:
       httpTimeout: 5000,
       // maximum number of retries per HTTP resource to get
       maxRetries: 5,
+      // whether or not HTTPS requests are checked against Node's list of CAs
+      // set false if you are using your own npm mirror with a self-signed SSL cert
+      rejectUnauthorized: true,
 
       // Remote and local URL
 
