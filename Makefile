@@ -11,4 +11,9 @@ test:
 		--bail \
 		$(TESTS)
 
-.PHONY: test
+lint:
+	jshint . --exclude="**/node_modules"
+	fixjsstyle --nojsdoc --jslint_error=all --disable=6 --max_line_length=120 --exclude_directories=node_modules -r .
+	gjslint --nojsdoc --jslint_error=all --disable=6 --max_line_length=120 --exclude_directories=node_modules -r .
+
+.PHONY: test lint

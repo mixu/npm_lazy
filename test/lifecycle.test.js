@@ -24,9 +24,9 @@ exports['given a lifecycle'] = {
   'when blocking, can add a onrelease action': function(done) {
     var assertions = 0;
     this.cycle.block('foo');
-    this.cycle.onRelease('foo', function() { assertions++; if (assertions == 3) { done(); } })
-    this.cycle.onRelease('foo', function() { assertions++; if (assertions == 3) { done(); } })
-    this.cycle.onRelease('foo', function() { assertions++; if (assertions == 3) { done(); } })
+    this.cycle.onRelease('foo', function() { assertions++; if (assertions == 3) { done(); } });
+    this.cycle.onRelease('foo', function() { assertions++; if (assertions == 3) { done(); } });
+    this.cycle.onRelease('foo', function() { assertions++; if (assertions == 3) { done(); } });
     this.cycle.release('foo');
   }
 
@@ -34,11 +34,12 @@ exports['given a lifecycle'] = {
 
 // if this module is the script being run, then run the tests:
 if (module == require.main) {
-  var mocha = require('child_process').spawn('mocha', [ '--colors', '--ui', 'exports', '--reporter', 'spec', __filename ]);
+  var mocha = require('child_process').spawn('mocha',
+    ['--colors', '--ui', 'exports', '--reporter', 'spec', __filename]);
   mocha.on('error', function() {
      console.log('Failed to start child process. You need mocha: `npm install -g mocha`');
   });
-  mocha.stderr.on('data', function (data) {
+  mocha.stderr.on('data', function(data) {
     if (/^execvp\(\)/.test(data)) {
      console.log('Failed to start child process. You need mocha: `npm install -g mocha`');
     }

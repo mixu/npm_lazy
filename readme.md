@@ -17,20 +17,6 @@ In response to the npm outage, I've made some improvements to npm_lazy. Previous
 
 The new version adds better caching support and resiliency to registry failures.
 
-### Resilient to registry failures (new in 1.x!)
-
-First, install a package successfully so that it is cached.
-
-Next, to simulate a network failure, add `0.0.0.1 registry.npmjs.org` to `/etc/hosts` and try installing that same package again (in another folder). You should see something like this:
-
-    npm_lazy at localhost port 8080
-    Fetch failed (1/5): http://registry.npmjs.org/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
-    Fetch failed (2/5): http://registry.npmjs.org/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
-    Fetch failed (3/5): http://registry.npmjs.org/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
-    Fetch failed (4/5): http://registry.npmjs.org/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
-    Fetch failed (5/5): http://registry.npmjs.org/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
-    [OK] Reusing cached result for http://registry.npmjs.org/socket.io
-
 Here are all the ways in which npm_lazy is resilient to registry failures:
 
 - All HTTP requests are retried up to a configurable number (default: 5 times).
@@ -65,6 +51,20 @@ To permanently set the registry via config file, in ~/.npmrc:
     registry = http://localhost:8080/
 
 For more info, see "npm help config" and "npm help registry".
+
+### Resiliency to registry failures (new in 1.x!)
+
+First, install a package successfully so that it is cached.
+
+Next, to simulate a network failure, add `0.0.0.1 registry.npmjs.org` to `/etc/hosts` and try installing that same package again (in another folder). You should see something like this:
+
+    npm_lazy at localhost port 8080
+    Fetch failed (1/5): http://registry.npmjs.org/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
+    Fetch failed (2/5): http://registry.npmjs.org/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
+    Fetch failed (3/5): http://registry.npmjs.org/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
+    Fetch failed (4/5): http://registry.npmjs.org/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
+    Fetch failed (5/5): http://registry.npmjs.org/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
+    [OK] Reusing cached result for http://registry.npmjs.org/socket.io
 
 ## Configuration
 

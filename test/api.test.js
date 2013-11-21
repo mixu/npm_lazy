@@ -21,7 +21,7 @@ exports['given a server'] = {
       externalUrl: 'http://localhost:9090'
     });
 
-    var server = http.createServer(function(req, res) {
+    http.createServer(function(req, res) {
       api.route(req, res);
     }).listen(9090, 'localhost', function() {
       done();
@@ -63,13 +63,13 @@ exports['given a server'] = {
   },
 
   'can use npm install requireincontext': function(done) {
-    var tmpdir = __dirname+'/tmp/';
+    var tmpdir = __dirname + '/tmp/';
     this.timeout(60000);
-    [ tmpdir + '/node_modules/requireincontext/index.js',
+    [tmpdir + '/node_modules/requireincontext/index.js',
       tmpdir + '/node_modules/requireincontext/package.json',
       tmpdir + '/node_modules/requireincontext/readme.md'
     ].forEach(function(p) {
-      if(fs.existsSync(p)) {
+      if (fs.existsSync(p)) {
         fs.unlinkSync(p);
       }
     });
@@ -78,7 +78,7 @@ exports['given a server'] = {
       require('child_process')
           .exec('npm --verbose --registry http://localhost:9090/ install',
                 { cwd: tmpdir },
-      function (error, stdout, stderr) {
+      function(error, stdout, stderr) {
         console.log('stdout: ' + stdout);
         console.log('stderr: ' + stderr);
         if (error !== null) {
@@ -94,11 +94,13 @@ exports['given a server'] = {
 
 // if this module is the script being run, then run the tests:
 if (module == require.main) {
-  var mocha = require('child_process').spawn('mocha', [ '--colors', '--ui', 'exports', '--reporter', 'spec', __filename ]);
+  var mocha = require('child_process').spawn('mocha', [
+    '--colors', '--ui', 'exports', '--reporter', 'spec', __filename
+  ]);
   mocha.on('error', function() {
      console.log('Failed to start child process. You need mocha: `npm install -g mocha`');
   });
-  mocha.stderr.on('data', function (data) {
+  mocha.stderr.on('data', function(data) {
     if (/^execvp\(\)/.test(data)) {
      console.log('Failed to start child process. You need mocha: `npm install -g mocha`');
     }

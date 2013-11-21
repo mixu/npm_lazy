@@ -22,21 +22,20 @@ function mockFetch(onDone) {
 
   // console.log('remote-read:', this.url, 'from', targetPath);
 
-  if(target == 'remote-retries.tgz') {
+  if (target == 'remote-retries.tgz') {
     return onDone(new Error('Fake error'));
   }
 
-  if(!fs.existsSync(targetPath)) {
+  if (!fs.existsSync(targetPath)) {
     throw new Error('Path does not exist ' + targetPath);
-    return;
   }
 
   // special case remote-retry: should succeed on 3rd try
-  if(target == 'remote-retry.json' && this.retries == 3) {
+  if (target == 'remote-retry.json' && this.retries == 3) {
     // return remote-retry-valid.json
     return onDone(null, fs.createReadStream(remoteDir + '/remote-retry-valid.json'));
   }
-  if(target == 'remote-retry-3.tgz' && this.retries == 3) {
+  if (target == 'remote-retry-3.tgz' && this.retries == 3) {
     // return remote-retry-valid.json
     return onDone(null, fs.createReadStream(remoteDir + '/remote-retry-3-valid.tgz'));
   }
@@ -48,7 +47,7 @@ function mockFetch(onDone) {
 }
 
 function read(fullpath) {
-  if(!fullpath) {
+  if (!fullpath) {
     return fullpath;
   }
   return fs.readFileSync(fullpath).toString();
@@ -74,7 +73,7 @@ exports['resource tests'] = {
           packagename = basename.substr(0, basename.length - path.extname(basename).length),
           remotename;
 
-      if(path.extname(basename) === '.json') {
+      if (path.extname(basename) === '.json') {
         remotename = 'http://registry.npmjs.org/' + packagename;
       } else {
         remotename = 'http://registry.npmjs.org/' +
@@ -242,7 +241,7 @@ exports['resource tests'] = {
           assert.ok(!err);
           assert.equal(JSON.parse(read(data)).name, 'remote-valid');
           counter++;
-          if(counter == 2) {
+          if (counter == 2) {
             done();
           }
         }
@@ -344,7 +343,7 @@ exports['resource tests'] = {
           assert.ok(!err);
           assert.equal(read(data).trim(), 'remote-valid-tar');
           counter++;
-          if(counter == 2) {
+          if (counter == 2) {
             done();
           }
         }
@@ -358,11 +357,12 @@ exports['resource tests'] = {
 
 // if this module is the script being run, then run the tests:
 if (module == require.main) {
-  var mocha = require('child_process').spawn('mocha', [ '--colors', '--ui', 'exports', '--bail',  '--reporter', 'spec', __filename ]);
+  var mocha = require('child_process').spawn('mocha',
+    ['--colors', '--ui', 'exports', '--bail', '--reporter', 'spec', __filename]);
   mocha.on('error', function() {
      console.log('Failed to start child process. You need mocha: `npm install -g mocha`');
   });
-  mocha.stderr.on('data', function (data) {
+  mocha.stderr.on('data', function(data) {
     if (/^execvp\(\)/.test(data)) {
      console.log('Failed to start child process. You need mocha: `npm install -g mocha`');
     }
