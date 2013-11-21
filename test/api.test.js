@@ -16,9 +16,13 @@ var FakeCache = {};
 exports['given a server'] = {
 
   before: function(done) {
+    cache = new Cache({ path: __dirname + '/db' });
     Resource.configure({
-      cache: new Cache({ path: __dirname + '/db/' })
+      cache: cache
     });
+
+    cache.clear();
+
     Package.configure({
       externalUrl: 'http://localhost:9090'
     });
@@ -28,6 +32,10 @@ exports['given a server'] = {
     }).listen(9090, 'localhost', function() {
       done();
     });
+  },
+
+  after: function() {
+    cache.clear();
   },
 
   'can GET a package index': function(done) {
@@ -62,6 +70,51 @@ exports['given a server'] = {
           done();
         });
       });
+  },
+
+  'self-signed': {
+    before: function() {
+      // Note: this test depends on the fact that isaacs.iriscouch.com/ exists
+      // and that it keeps serving the cert for registry.npmjs.org which
+      // obviously fails validation
+
+      // Note that this test seems to always pass in Node v0.8.x but works correctly in 0.10.x
+
+      Resource.configure({
+        rejectUnauthorized: false
+      });
+      Package.configure({
+        remoteUrl: 'https://isaacs.iriscouch.com/registry/_design/app/_rewrite/'
+      });
+    },
+
+    after: function() {
+      Resource.configure({
+        rejectUnauthorized: true
+      });
+      Package.configure({
+        remoteUrl: 'http://registry.npmjs.org/'
+      });
+    },
+
+    'can GET a package index which has a self-signed cert': function(done) {
+      this.timeout(60000); // because I'm tethering
+      Client
+        .get('http://localhost:9090/microee')
+        .end(function(err, res) {
+          if (err) throw err;
+          var data = '';
+          res.on('data', function(c) {
+            data += c;
+          });
+          res.on('end', function() {
+            assert.ok(typeof JSON.parse(data) === 'object');
+
+
+            done();
+          });
+        });
+    }
   },
 
   'can use npm install requireincontext': function(done) {
