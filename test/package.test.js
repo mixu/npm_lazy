@@ -11,7 +11,9 @@ exports['given a package'] = {
 
   before: function(done) {
     cache = new Cache({ path: __dirname + '/tmp' });
-    Resource.setCache(cache);
+    Resource.configure({
+      cache: cache
+    });
 
     cache.clear();
 

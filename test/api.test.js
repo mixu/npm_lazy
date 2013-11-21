@@ -16,7 +16,9 @@ var FakeCache = {};
 exports['given a server'] = {
 
   before: function(done) {
-    Resource.setCache(new Cache({ path: __dirname + '/db/' }));
+    Resource.configure({
+      cache: new Cache({ path: __dirname + '/db/' })
+    });
     Package.configure({
       externalUrl: 'http://localhost:9090'
     });

@@ -6,10 +6,13 @@ var http = require('http'),
     Resource = require('./lib/resource.js'),
     config = require('./config.js');
 
-Resource.setCache(new Cache({ path: config.cacheDirectory }));
-Resource.setCacheAge(config.cacheAge);
-Resource.setMaxRetries(config.maxRetries);
-Resource.setTimeout(config.httpTimeout);
+Resource.configure({
+  cache: new Cache({ path: config.cacheDirectory }),
+  cacheAge: config.cacheAge,
+  maxRetries: config.maxRetries,
+  timeout: config.httpTimeout,
+  rejectUnauthorized: config.rejectUnauthorized
+});
 
 Package.configure({
   externalUrl: config.externalUrl,

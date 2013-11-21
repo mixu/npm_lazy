@@ -60,7 +60,7 @@ exports['resource tests'] = {
     cache.clear();
 
     // fixture setup
-    Resource.setCache(cache);
+    Resource.configure({ cache: cache });
 
     // for each file in fixtures/local, store them in the cache
     // as if they had already been downloaded
@@ -177,13 +177,13 @@ exports['resource tests'] = {
         Resource.prototype.isUpToDate = function() {
           return false;
         };
-        Resource.setTimeout(10);
+        Resource.configure({ timeout: 10 });
       },
 
       after: function() {
         Resource.prototype._fetchTask = mockFetch;
         Resource.prototype.isUpToDate = oldIsUpToDate;
-        Resource.setTimeout(2000);
+        Resource.configure({ timeout: 2000 });
       },
 
       'if the fetch times out, use the cached version': function(done) {
@@ -298,12 +298,12 @@ exports['resource tests'] = {
       before: function() {
         Resource.prototype._fetchTask = function() { };
         oldIsUpToDate = Resource.prototype.isUpToDate;
-        Resource.setTimeout(10);
+        Resource.configure({ timeout: 10 });
       },
 
       after: function() {
         Resource.prototype._fetchTask = mockFetch;
-        Resource.setTimeout(2000);
+        Resource.configure({ timeout: 2000 });
       },
 
       'if the fetch times out, and the object is not cached, throw': function(done) {
