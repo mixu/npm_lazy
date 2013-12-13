@@ -4,7 +4,16 @@ var http = require('http'),
     Cache = require('./lib/cache2.js'),
     Package = require('./lib/package.js'),
     Resource = require('./lib/resource.js'),
-    config = require('./config.js');
+    config = require('./config.js'),
+    fs = require('fs'),
+    argv = require('optimist')
+      .default('config', config)
+      .alias('c', 'config')
+      .argv;
+
+if (argv.config){
+  config = require(argv.config);
+}
 
 Resource.configure({
   cache: new Cache({ path: config.cacheDirectory }),
