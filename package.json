@@ -18,6 +18,7 @@
   },
   "license": "BSD",
   "devDependencies": {
-    "mocha": "*"
+    "mocha": "*",
+    "optimist": "~0.6.0"
   }
 }
