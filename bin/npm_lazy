@@ -7,6 +7,7 @@ var fs = require('fs'),
       .options({
         'config': { },
         'help': { alias: 'h' },
+        'init': { },
         'show-config': { },
         'version': { }
       }),
@@ -17,11 +18,19 @@ if(argv['version'] || argv['v'] ) {
   process.exit();
 }
 
+if(argv['init']) {
+  return fs.createReadStream(__dirname + '/../config.js')
+    .pipe(process.stdout)
+    .on('close', function () {
+      process.exit();
+    });
+}
+
 if(argv['help']) {
   return fs.createReadStream(__dirname + '/usage.txt')
     .pipe(process.stdout)
     .on('close', function () {
-      process.exit(1);
+      process.exit();
     });
 }
 

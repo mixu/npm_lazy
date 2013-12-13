@@ -2,7 +2,9 @@ Usage: npm_lazy [options]
 
 Options:
 
-  -c, --config <path>   Load configuration file (e.g. `npm_lazy --config ~/npm_lazy.json`).
+  -c, --config <path>   Load configuration file (e.g. `npm_lazy --config ~/npm_lazy.js`).
+  --init                Print out the default configuration. Use this to initialize
+                        your config file, e.g. `npm_lazy --init > ~/npm_lazy.js`.
   --show-config         Show the loaded configuration during startup
   -v, --version         Show version
   -h, --help            Show help
