@@ -2,6 +2,15 @@
   "name": "npm_lazy",
   "description": "Lazy local npm cache server",
   "version": "1.0.2",
+  "license": "BSD",
+  "bin": {
+    "npm_lazy": "./bin/npm_lazy"
+  },
+  "keywords": [
+    "mirror",
+    "npm",
+    "registry"
+  ],
   "main": "./server.js",
   "dependencies": {
     "mkdirp": "0.3.x",
@@ -10,15 +19,15 @@
     "minitask": "0.0.1",
     "rimraf": "~2.2.2",
     "microee": "0.0.2",
-    "mixu_minimal": "0.0.1"
+    "mixu_minimal": "0.0.1",
+    "optimist": "~0.6.0",
+    "resolve": "~0.6.1"
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/mixu/npm_lazy.git"
   },
-  "license": "BSD",
   "devDependencies": {
-    "mocha": "*",
-    "optimist": "~0.6.0"
+    "mocha": "*"
   }
 }

@@ -3,38 +3,41 @@ var http = require('http'),
     api = require('./lib/api.js'),
     Cache = require('./lib/cache2.js'),
     Package = require('./lib/package.js'),
-    Resource = require('./lib/resource.js'),
-    config = require('./config.js'),
-    fs = require('fs'),
-    argv = require('optimist')
-      .default('config', config)
-      .alias('c', 'config')
-      .argv;
+    Resource = require('./lib/resource.js');
 
-if (argv.config){
-  config = require(argv.config);
+function start(config) {
+  Resource.configure({
+    cache: new Cache({ path: config.cacheDirectory }),
+    cacheAge: config.cacheAge,
+    maxRetries: config.maxRetries,
+    timeout: config.httpTimeout,
+    rejectUnauthorized: config.rejectUnauthorized
+  });
+
+  Package.configure({
+    externalUrl: config.externalUrl,
+    remoteUrl: config.remoteUrl
+  });
+
+  var server = http.createServer();
+
+  server.on('request', function(req, res) {
+    if (!api.route(req, res)) {
+      console.log('No route found', req.url);
+      res.end();
+    }
+  }).listen(config.port, config.host);
+
+  console.log('npm_lazy at', config.host, 'port', config.port);
+};
+
+
+// if this module is the script being run, then load the default config and run
+// makes it possible to call `node server.js` and have it work like before.
+// Alternatively, you can require server.js and then call the start function with a
+// custom config like we do in ./bin/npm_lazy
+if (module == require.main) {
+  start(require('./config.js'));
 }
 
-Resource.configure({
-  cache: new Cache({ path: config.cacheDirectory }),
-  cacheAge: config.cacheAge,
-  maxRetries: config.maxRetries,
-  timeout: config.httpTimeout,
-  rejectUnauthorized: config.rejectUnauthorized
-});
-
-Package.configure({
-  externalUrl: config.externalUrl,
-  remoteUrl: config.remoteUrl
-});
-
-var server = http.createServer();
-
-server.on('request', function(req, res) {
-  if (!api.route(req, res)) {
-    console.log('No route found', req.url);
-    res.end();
-  }
-}).listen(config.port, config.host);
-
-console.log('npm_lazy at', config.host, 'port', config.port);
+module.exports = start;
