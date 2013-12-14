@@ -1,8 +1,13 @@
+var path = require('path'),
+    homePath = path.normalize(process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME']);
+
 module.exports = {
   // Cache config
 
-  // directory to store cached packages (full path)
-  cacheDirectory: __dirname + '/db/',
+  // Directory to store cached packages.
+  // Since any relative path is resolved relative to the current working
+  // directory when the server is started, you should use a full path.
+  cacheDirectory: homePath + '/.npm_lazy',
   // maximum age before an index is refreshed from npm
   cacheAge: 60 * 60 * 1000,
 

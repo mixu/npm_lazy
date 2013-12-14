@@ -26,15 +26,27 @@ Here are all the ways in which npm_lazy is resilient to registry failures:
   - Metadata files must parse as JSON; if not, they are retried.
 - Metadata files are never discarded until a newer version can be fetched successfully. If the JSON metadata is older than `cacheAge` (default: 1 hour), we will attempt to contact the registry first. However, if contacting the registry fails, then the old version of the metadata is sent instead. This means that even when outages occur, you can install any package that has been installed at least once before.
 
-## Installation
+## Installation (updated in 1.1.x)
 
-    npm install npm_lazy
+v1.1.x adds a command called `npm_lazy` to make things even easier. Install via npm:
 
-Or: `git clone git@github.com:mixu/npm_lazy.git && cd npm_lazy && npm install`.
+    sudo npm install -g npm_lazy
 
-Edit configuration in config.js (e.g. port and external URL) and start the server:
+To start the server, run:
 
-    node server.js
+    npm_lazy
+
+To edit the configuration, start by initializing a file from the default config file:
+
+    npm_lazy --init > ~/npm_lazy.config.js
+
+To start the server with a custom configuration:
+
+    npm_lazy --config ~/npm_lazy.config.js
+
+## Installation by cloning the repo
+
+Or alternatively, if you don't want to install this globally, you can just clone the repo: `git clone git@github.com:mixu/npm_lazy.git && cd npm_lazy && npm install` and edit `config.js`.
 
 ## Pointing npm to npm_lazy
 
@@ -70,11 +82,16 @@ Next, to simulate a network failure, add `0.0.0.1 registry.npmjs.org` to `/etc/h
 
 Configured by editing `config.js` in the same directory:
 
+    var path = require('path'),
+        homePath = path.normalize(process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME']);
+
     module.exports = {
       // Cache config
 
-      // directory to store cached packages (full path)
-      cacheDirectory: __dirname+'/db/',
+      // Directory to store cached packages.
+      // Since any relative path is resolved relative to the current working
+      // directory when the server is started, you should use a full path.
+      cacheDirectory: homePath + '/.npm_lazy',
       // maximum age before an index is refreshed from npm
       cacheAge: 60 * 60 * 1000,
 

@@ -1,4 +1,5 @@
 var http = require('http'),
+    path = require('path'),
 
     api = require('./lib/api.js'),
     Cache = require('./lib/cache2.js'),
@@ -29,6 +30,7 @@ function start(config) {
   }).listen(config.port, config.host);
 
   console.log('npm_lazy at', config.host, 'port', config.port);
+  console.log('npm_lazy cache directory:', path.normalize(config.cacheDirectory));
 };
 
 
