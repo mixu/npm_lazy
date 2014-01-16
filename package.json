@@ -1,7 +1,7 @@
 {
   "name": "npm_lazy",
   "description": "Lazy local npm cache server",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "license": "BSD",
   "bin": {
     "npm_lazy": "./bin/npm_lazy"
