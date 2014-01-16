@@ -5,7 +5,7 @@ var fs = require('fs'),
     start = require('../server.js'),
     opts = require('optimist')
       .options({
-        'config': { },
+        'config': { alias: 'c' },
         'help': { alias: 'h' },
         'init': { },
         'show-config': { },
