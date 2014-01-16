@@ -109,6 +109,7 @@ Configured by editing `config.js` in the same directory:
       // directory when the server is started, you should use a full path.
       cacheDirectory: homePath + '/.npm_lazy',
       // maximum age before an index is refreshed from npm
+      // negative value means no refresh (since v1.2.1)
       cacheAge: 60 * 60 * 1000,
 
       // Request config
