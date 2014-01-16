@@ -15,10 +15,13 @@ function start(config) {
     rejectUnauthorized: config.rejectUnauthorized
   });
 
-  Package.configure({
+  var packageConfig = {
     externalUrl: config.externalUrl,
     remoteUrl: config.remoteUrl
-  });
+  };
+
+  Package.configure(packageConfig);
+  api.configure(packageConfig);
 
   var server = http.createServer();
 
