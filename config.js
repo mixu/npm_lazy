@@ -8,7 +8,8 @@ module.exports = {
   // Since any relative path is resolved relative to the current working
   // directory when the server is started, you should use a full path.
   cacheDirectory: homePath + '/.npm_lazy',
-  // maximum age before an index is refreshed from npm
+  // maximum age before an index is refreshed from remoteUrl
+  // negative value means no refresh
   cacheAge: 60 * 60 * 1000,
 
   // Request config
