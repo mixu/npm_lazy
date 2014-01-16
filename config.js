@@ -14,7 +14,7 @@ module.exports = {
   // Request config
 
   // max milliseconds to wait for each HTTP response
-  httpTimeout: 5000,
+  httpTimeout: 10000,
   // maximum number of retries per HTTP resource to get
   maxRetries: 5,
   // whether or not HTTPS requests are checked against Node's list of CAs

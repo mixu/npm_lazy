@@ -11,6 +11,10 @@ A lazy local cache for npm
 - Lazy caching: When a package is requested the first time, it is cached locally. No explicit need to manage packages or replication.
 - Metadata is expired periodically (default: 1 hour) so that the latest versions of packages are fetched.
 
+## New in version 1.2.x
+
+Reworked the behavior with regards to index files, where npm_lazy would return a 500 even though it had an package.json file in it's cache once the maxRetries were exhausted if the file was considered to be up to date. The new/fixed behavior is to always fall back to the cached file.
+
 ## New in version 1.x
 
 In response to the npm outage, I've made some improvements to npm_lazy. Previously, the primary use case was to prevent multiple servers in a large deploy from causing duplicate requests.
@@ -19,7 +23,7 @@ The new version adds better caching support and resiliency to registry failures.
 
 Here are all the ways in which npm_lazy is resilient to registry failures:
 
-- All HTTP requests are retried up to a configurable number (default: 5 times).
+- All HTTP requests are retried.
 - All HTTP requests are subject to a maximum fetch timeout (default: 5000 ms). If this fails, the request is retried (or failed).
 - Invalid responses are rejected and retried:
   - Tarfiles are checked against the expected shasum, and cached forever if they match; if not, they are retried.
@@ -64,6 +68,17 @@ To permanently set the registry via config file, in ~/.npmrc:
 
 For more info, see "npm help config" and "npm help registry".
 
+### Tips and tricks:
+
+A few things that might be useful to know:
+
+- Start by running `npm cache clean` so that your local npm command will request every package you want at least once from npm_lazy.
+- Starting with v1.2.0, npm_lazy will only return a 500 error if it does not have specific file.
+- To clear out the npm_lazy cache, simply remove the cache directory and restart npm_lazy. npm_lazy prints out the cache location when it starts, and it defaults to `~/.npm_lazy`.
+- Restarting npm_lazy will clear the package.json metadata refresh timeout and the max retries counter. All cached entries, including package.json files and tarfiles are kept, so you can safely restart the server to expire the metadata `cacheAge` while retaining all cached artifacts.
+- npm_lazy works by rewriting the download URLs for package.json results, so old files from `npm shrinkwrap` may interfere with it since they may contain direct references to registry.npmjs.org. Make sure you clean up that stuff.
+- If you are using self-signed certs, set `rejectUnauthorized` to false in the config.
+
 ### Resiliency to registry failures (new in 1.x!)
 
 First, install a package successfully so that it is cached.
@@ -71,6 +86,7 @@ First, install a package successfully so that it is cached.
 Next, to simulate a network failure, add `0.0.0.1 registry.npmjs.org` to `/etc/hosts` and try installing that same package again (in another folder). You should see something like this:
 
     npm_lazy at localhost port 8080
+    npm_lazy cache directory: /home/m/.npm_lazy
     Fetch failed (1/5): http://registry.npmjs.org/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
     Fetch failed (2/5): http://registry.npmjs.org/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
     Fetch failed (3/5): http://registry.npmjs.org/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
@@ -98,7 +114,7 @@ Configured by editing `config.js` in the same directory:
       // Request config
 
       // max milliseconds to wait for each HTTP response
-      httpTimeout: 5000,
+      httpTimeout: 10000,
       // maximum number of retries per HTTP resource to get
       maxRetries: 5,
       // whether or not HTTPS requests are checked against Node's list of CAs

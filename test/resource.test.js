@@ -31,11 +31,11 @@ function mockFetch(onDone) {
   }
 
   // special case remote-retry: should succeed on 3rd try
-  if (target == 'remote-retry.json' && this.retries == 3) {
+  if (target == 'remote-retry.json' && this.retries == 1) {
     // return remote-retry-valid.json
     return onDone(null, fs.createReadStream(remoteDir + '/remote-retry-valid.json'));
   }
-  if (target == 'remote-retry-3.tgz' && this.retries == 3) {
+  if (target == 'remote-retry-3.tgz' && this.retries == 1) {
     // return remote-retry-valid.json
     return onDone(null, fs.createReadStream(remoteDir + '/remote-retry-3-valid.tgz'));
   }
@@ -198,7 +198,7 @@ exports['resource tests'] = {
 
         r.getReadablePath(function(err, data) {
           assert.ok(!err);
-          assert.equal(errors.length, 3);
+          assert.equal(errors.length, 1);
           assert.equal(JSON.parse(read(data)).name, 'local-cached');
           done();
         });

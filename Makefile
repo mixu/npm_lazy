@@ -1,7 +1,7 @@
 TESTS += test/api.test.js
-TESTS += test/cache.test.js
 TESTS += test/lifecycle.test.js
 TESTS += test/package.test.js
+TESTS += test/resource.test.js
 
 test:
 	# Why /usr/bin/env? Because I want stuff like nvm versions to take precedence
