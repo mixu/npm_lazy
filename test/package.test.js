@@ -3,8 +3,8 @@ var fs = require('fs'),
     assert = require('assert'),
 
     Package = require('../lib/package.js'),
-    verify = require('../lib/verify2.js'),
-    Cache = require('../lib/cache2.js'),
+    verify = require('../lib/verify.js'),
+    Cache = require('../lib/cache.js'),
     Resource = require('../lib/resource.js');
 
 exports['given a package'] = {

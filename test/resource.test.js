@@ -4,7 +4,7 @@ var fs = require('fs'),
     assert = require('assert'),
     npmLazy = require('npm_lazy'),
     Resource = npmLazy.Resource,
-    Cache = require('../lib/cache2.js');
+    Cache = require('../lib/cache.js');
 
 var cache = new Cache({ path: __dirname + '/db' }),
         remoteDir = __dirname + '/fixtures/remote',
