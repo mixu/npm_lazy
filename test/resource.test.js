@@ -198,7 +198,7 @@ exports['resource tests'] = {
 
         r.getReadablePath(function(err, data) {
           assert.ok(!err);
-          assert.equal(errors.length, 1);
+          assert.ok(errors.length > 0);
           assert.equal(JSON.parse(read(data)).name, 'local-cached');
           done();
         });
