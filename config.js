@@ -30,5 +30,5 @@ module.exports = {
   remoteUrl: 'http://registry.npmjs.org/',
   // bind port and host
   port: 8080,
-  host: 'localhost'
+  host: '0.0.0.0'
 };

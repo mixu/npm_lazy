@@ -28,7 +28,7 @@ function start(config) {
   server.on('request', function(req, res) {
     if (!api.route(req, res)) {
       console.log('No route found', req.url);
-      res.end();
+      Package.proxy(req, res);
     }
   }).listen(config.port, config.host);
 
