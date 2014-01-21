@@ -17,7 +17,8 @@ function start(config) {
 
   var packageConfig = {
     externalUrl: config.externalUrl,
-    remoteUrl: config.remoteUrl
+    remoteUrl: config.remoteUrl,
+    rejectUnauthorized: config.rejectUnauthorized
   };
 
   Package.configure(packageConfig);

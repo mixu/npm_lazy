@@ -11,6 +11,14 @@ A lazy local cache for npm
 - Lazy caching: When a package is requested the first time, it is cached locally. No explicit need to manage packages or replication.
 - Metadata is expired periodically (default: 1 hour) so that the latest versions of packages are fetched.
 
+## New in version 1.3.x
+
+`npm search` and other non-installation related npm queries are now proxied to the registry.
+
+Note that only package index metadata and package tarfiles are cached; all other endpoints are just a transparently proxied (e.g. you can always run `npm install` for cached packages but more exotic npm endpoints will not work if the registry is down; they will simply act like their non-npm_lazy equivalents).
+
+Also, note that if you intend to write through npm_lazy you must set `cacheAge` to `0` so that npm metadata is always refreshed because npm wants to know that you have the most recent package `_id` before it allows writing. This will still return cached data for package.json indexes needed for installation if the registry is down, but only after attempting to contact the registry (this seems like a decent, but not perfect compromise).
+
 ## New in version 1.2.x
 
 Reworked the behavior with regards to index files, where npm_lazy would return a 500 even though it had an package.json file in it's cache once the maxRetries were exhausted if the file was considered to be up to date. The new/fixed behavior is to always fall back to the cached file.
@@ -98,40 +106,53 @@ Next, to simulate a network failure, add `0.0.0.1 registry.npmjs.org` to `/etc/h
 
 Configured by editing `config.js` in the same directory:
 
-    var path = require('path'),
-        homePath = path.normalize(process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME']);
+````js
+var path = require('path'),
+    homePath = path.normalize(process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME']);
 
-    module.exports = {
-      // Cache config
+module.exports = {
+  // Cache config
 
-      // Directory to store cached packages.
-      // Since any relative path is resolved relative to the current working
-      // directory when the server is started, you should use a full path.
-      cacheDirectory: homePath + '/.npm_lazy',
-      // maximum age before an index is refreshed from npm
-      // negative value means no refresh (since v1.2.1)
-      cacheAge: 60 * 60 * 1000,
+  // `cacheDirectory`: Directory to store cached packages.
+  //
+  // Note: Since any relative path is resolved relative to the current working
+  // directory when the server is started, you should use a full path.
 
-      // Request config
+  cacheDirectory: homePath + '/.npm_lazy',
 
-      // max milliseconds to wait for each HTTP response
-      httpTimeout: 10000,
-      // maximum number of retries per HTTP resource to get
-      maxRetries: 5,
-      // whether or not HTTPS requests are checked against Node's list of CAs
-      // set false if you are using your own npm mirror with a self-signed SSL cert
-      rejectUnauthorized: true,
+  // `cacheAge`: maximum age before an index is refreshed from remoteUrl
+  // - negative value means no refresh (e.g. once cached, never update the package.json metadata)
+  // - zero means always refresh (e.g. always ask the registry for metadata)
+  // - positive value means refresh every n milliseconds
+  //   (e.g. 60 * 60 * 1000 = expire metadata every 60 minutes)
+  //
+  // Note: if you want to use `npm star` and other methods which update
+  // npm metadata, you will need to set cacheAge to 0. npm generally wants the latest
+  // package metadata version so caching package metadata will interfere with it.
 
-      // Remote and local URL
+  cacheAge: 60 * 60 * 1000,
 
-      // external url to npm_lazy, no trailing /
-      externalUrl: 'http://localhost:8080',
-      // registry url with trailing /
-      remoteUrl: 'http://registry.npmjs.org/',
-      // bind port and host
-      port: 8080,
-      host: 'localhost'
-    };
+  // Request config
+
+  // max milliseconds to wait for each HTTP response
+  httpTimeout: 10000,
+  // maximum number of retries per HTTP resource to get
+  maxRetries: 5,
+  // whether or not HTTPS requests are checked against Node's list of CAs
+  // set false if you are using your own npm mirror with a self-signed SSL cert
+  rejectUnauthorized: true,
+
+  // Remote and local URL
+
+  // external url to npm_lazy, no trailing /
+  externalUrl: 'http://localhost:8080',
+  // registry url with trailing /
+  remoteUrl: 'https://registry.npmjs.org/',
+  // bind port and host
+  port: 8080,
+  host: '0.0.0.0'
+};
+````
 
 ## Caching logic
 
