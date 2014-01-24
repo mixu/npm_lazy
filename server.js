@@ -1,5 +1,7 @@
 var http = require('http'),
     path = require('path'),
+    fs = require('fs'),
+    log = require('minilog')('app'),
 
     api = require('./lib/api.js'),
     Cache = require('./lib/cache.js'),
@@ -7,8 +9,21 @@ var http = require('http'),
     Resource = require('./lib/resource.js');
 
 function start(config) {
+  var minilog = require('minilog');
+
+  if (config.loggingOpts.logToConsole) {
+    minilog.enable();
+  } else {
+    minilog.disable();
+  }
+
+  if (config.loggingOpts.logToFile) {
+    minilog.pipe(fs.createWriteStream(config.loggingOpts.filename));
+  }
+
   Resource.configure({
     cache: new Cache({ path: config.cacheDirectory }),
+    logger: log,
     cacheAge: config.cacheAge,
     maxRetries: config.maxRetries,
     timeout: config.httpTimeout,
@@ -16,6 +31,7 @@ function start(config) {
   });
 
   var packageConfig = {
+    logger: log,
     externalUrl: config.externalUrl,
     remoteUrl: config.remoteUrl,
     rejectUnauthorized: config.rejectUnauthorized
@@ -28,14 +44,14 @@ function start(config) {
 
   server.on('request', function(req, res) {
     if (!api.route(req, res)) {
-      console.log('No route found', req.url);
+      log.error('No route found', req.url);
       Package.proxy(req, res);
     }
   }).listen(config.port, config.host);
 
-  console.log('npm_lazy at', config.host, 'port', config.port);
-  console.log('npm_lazy cache directory:', path.normalize(config.cacheDirectory));
-};
+  log.info('npm_lazy at', config.host, 'port', config.port);
+  log.info('npm_lazy cache directory:', path.normalize(config.cacheDirectory));
+}
 
 
 // if this module is the script being run, then load the default config and run
