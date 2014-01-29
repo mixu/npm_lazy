@@ -2,6 +2,17 @@ var path = require('path'),
     homePath = path.normalize(process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME']);
 
 module.exports = {
+  // Logging config
+  loggingOpts: {
+    // Print to stdout with colors
+    logToConsole: true,
+    // Write to file
+    logToFile: false,
+
+    // This should be a file path.
+    filename: 'npm_lazy.log'
+  },
+
   // Cache config
 
   // `cacheDirectory`: Directory to store cached packages.
