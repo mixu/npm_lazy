@@ -11,6 +11,14 @@ A lazy local cache for npm
 - Lazy caching: When a package is requested the first time, it is cached locally. No explicit need to manage packages or replication.
 - Metadata is expired periodically (default: 1 hour) so that the latest versions of packages are fetched.
 
+## New in version 1.4.x
+
+Bug fixes and improvements:
+
+- Fixed a bug with garbage collecting `package.json` files.
+- Fixed a bug which occurred when the package file on the registry was updated by the author without bumping the version, resulting in a checksum mismatch between the cached tarfile and the metadata.
+- Added support for logging to file (`loggingOpts`).
+
 ## New in version 1.3.x
 
 `npm search` and other non-installation related npm queries are now proxied to the registry.
@@ -111,6 +119,18 @@ var path = require('path'),
     homePath = path.normalize(process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME']);
 
 module.exports = {
+  // Logging config
+
+  loggingOpts: {
+    // Print to stdout with colors
+    logToConsole: true,
+    // Write to file
+    logToFile: false,
+
+    // This should be a file path.
+    filename: homePath + '/npm_lazy.log'
+  },
+
   // Cache config
 
   // `cacheDirectory`: Directory to store cached packages.
@@ -129,8 +149,9 @@ module.exports = {
   // Note: if you want to use `npm star` and other methods which update
   // npm metadata, you will need to set cacheAge to 0. npm generally wants the latest
   // package metadata version so caching package metadata will interfere with it.
-
-  cacheAge: 60 * 60 * 1000,
+  //
+  // Recommended setting: 0
+  cacheAge: 0,
 
   // Request config
 
@@ -152,6 +173,7 @@ module.exports = {
   port: 8080,
   host: '0.0.0.0'
 };
+
 ````
 
 ## Caching logic
