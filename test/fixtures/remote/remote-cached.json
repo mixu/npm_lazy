@@ -1,0 +1,12 @@
+{
+  "name": "remote-cached",
+  "versions": {
+    "0.0.1": {
+      "name": "remote-cached",
+      "dist": {
+        "tarball": "http://foo/remote-cached.tgz",
+        "shasum": "1ffc692160f4cea33b3489ac0b9b281eb87b03eb"
+      }
+    }
+  }
+ }

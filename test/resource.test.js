@@ -20,7 +20,7 @@ function mockFetch(onDone) {
   var target = getTargetBasename(this.url),
       targetPath = remoteDir + '/' + target;
 
-  // console.log('remote-read:', this.url, 'from', targetPath);
+  console.log('remote-read:', this.url, 'from', targetPath);
 
   if (target == 'remote-retries.tgz') {
     return onDone(new Error('Fake error'));

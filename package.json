@@ -16,9 +16,7 @@
     "mkdirp": "0.3.x",
     "semver": "1.0",
     "minilog": "~2.0.2",
-    "minitask": "0.0.1",
-    "rimraf": "~2.2.2",
-    "microee": "0.0.2",
+    "microee": "0.0.5",
     "mixu_minimal": "0.0.1",
     "optimist": "~0.6.0",
     "resolve": "~0.6.1"
@@ -28,6 +26,7 @@
     "url": "git://github.com/mixu/npm_lazy.git"
   },
   "devDependencies": {
-    "mocha": "*"
+    "mocha": "*",
+    "bytes": "~0.2.1"
   }
 }

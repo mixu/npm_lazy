@@ -1,1 +1,69 @@
-{"_id":"foo","_rev":"3-211b7de5301068de4bf67407ec9ec080","name":"foo","description":"A test module with no `main`, `lib`, or `dependencies` specified","dist-tags":{"latest":"1.0.0"},"versions":{"1.0.0":{"author":{"name":"AJ ONeal","email":"coolaj86@gmail.com","url":"http://coolaj86.info"},"name":"foo","description":"A test module with no `main`, `lib`, or `dependencies` specified","version":"1.0.0","repository":{"type":"git","url":"git://github.com/coolaj86/node-pakman.git"},"engines":{"node":">= v0.2"},"_npmUser":{"name":"coolaj86","email":"coolaj86@gmail.com"},"_id":"foo@1.0.0","dependencies":{},"devDependencies":{},"_engineSupported":true,"_npmVersion":"1.0.101","_nodeVersion":"v0.4.8","_defaultsLoaded":true,"dist":{"shasum":"943e0ec03df00ebeb6273a5b94b916ba54b47581","tarball":"http://registry.npmjs.org/foo/-/foo-1.0.0.tgz"},"maintainers":[{"name":"coolaj86","email":"coolaj86@gmail.com"}],"directories":{}}},"maintainers":[{"name":"coolaj86","email":"coolaj86@gmail.com"}],"time":{"1.0.0":"2011-10-21T23:45:45.878Z"},"author":{"name":"AJ ONeal","email":"coolaj86@gmail.com","url":"http://coolaj86.info"},"repository":{"type":"git","url":"git://github.com/coolaj86/node-pakman.git"},"_attachments":{"foo-1.0.0.tgz":{"content_type":"application/octet-stream","revpos":3,"digest":"md5-rCIIP5gNDQfPo8zX593pgQ==","length":10240,"stub":true}}}
+{
+  "_id": "foo",
+  "_rev": "3-211b7de5301068de4bf67407ec9ec080",
+  "name": "foo",
+  "description": "A test module with no `main`, `lib`, or `dependencies` specified",
+  "dist-tags": {
+    "latest": "1.0.0"
+  },
+  "versions": {
+    "1.0.0": {
+      "author": {
+        "name": "AJ ONeal",
+        "email": "coolaj86@gmail.com",
+        "url": "http://coolaj86.info"
+      },
+      "name": "foo",
+      "description": "A test module with no `main`, `lib`, or `dependencies` specified",
+      "version": "1.0.0",
+      "repository": {
+        "type": "git",
+        "url": "git://github.com/coolaj86/node-pakman.git"
+      },
+      "engines": {
+        "node": ">= v0.2"
+      },
+      "_npmUser": {
+        "name": "coolaj86",
+        "email": "coolaj86@gmail.com"
+      },
+      "_id": "foo@1.0.0",
+      "dependencies": {},
+      "devDependencies": {},
+      "_engineSupported": true,
+      "_npmVersion": "1.0.101",
+      "_nodeVersion": "v0.4.8",
+      "_defaultsLoaded": true,
+      "dist": {
+        "shasum": "943e0ec03df00ebeb6273a5b94b916ba54b47581",
+        "tarball": "http://localhost:8080/foo/-/foo-1.0.0.tgz"
+      },
+      "maintainers": [
+        {
+          "name": "coolaj86",
+          "email": "coolaj86@gmail.com"
+        }
+      ],
+      "directories": {}
+    }
+  },
+  "maintainers": [
+    {
+      "name": "coolaj86",
+      "email": "coolaj86@gmail.com"
+    }
+  ],
+  "time": {
+    "1.0.0": "2011-10-21T23:45:45.878Z"
+  },
+  "author": {
+    "name": "AJ ONeal",
+    "email": "coolaj86@gmail.com",
+    "url": "http://coolaj86.info"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/coolaj86/node-pakman.git"
+  },
+  "_attachments": {}
+}

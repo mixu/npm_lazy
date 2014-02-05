@@ -25,12 +25,15 @@ exports['given a package'] = {
 
   'can fetch a package index': function(done) {
     this.timeout(10000);
-    Package.getIndex('foo', function(err, json) {
+
+    // Note: this goes out the the real reg!
+
+    Package.getIndex('foo', function(err, actual) {
       var expected = JSON.parse(
         fs.readFileSync(__dirname + '/db/foo.json')
         .toString().replace('http://registry.npmjs.org/foo', 'http://localhost:8080/foo')
       );
-      assert.deepEqual(json, expected);
+      assert.deepEqual(actual, expected);
       done();
     });
   },

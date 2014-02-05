@@ -10,7 +10,7 @@ module.exports = {
     logToFile: false,
 
     // This should be a file path.
-    filename: 'npm_lazy.log'
+    filename: homePath + '/npm_lazy.log'
   },
 
   // Cache config
@@ -32,7 +32,8 @@ module.exports = {
   // npm metadata, you will need to set cacheAge to 0. npm generally wants the latest
   // package metadata version so caching package metadata will interfere with it.
 
-  cacheAge: 60 * 60 * 1000,
+  // Recommended setting: 0
+  cacheAge: 0,
 
   // Request config
 
