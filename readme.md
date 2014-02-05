@@ -16,8 +16,8 @@ A lazy local cache for npm
 Bug fixes and improvements:
 
 - Fixed a bug with garbage collecting `package.json` files.
-- Fixed a bug which occurred when the package file on the registry was updated by the author without bumping the version, resulting in a checksum mismatch between the cached tarfile and the metadata.
-- Added support for logging to file (`loggingOpts`).
+- Fixed a bug which occurred when the package file on the registry was updated by the author without bumping the version, resulting in a checksum mismatch between the cached tarfile and the metadata. Thanks @univerio!
+- Added support for logging to file (`loggingOpts`). Thanks @Damiya!
 
 ## New in version 1.3.x
 
