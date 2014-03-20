@@ -11,6 +11,10 @@ A lazy local cache for npm
 - Lazy caching: When a package is requested the first time, it is cached locally. No explicit need to manage packages or replication.
 - Metadata is expired periodically (default: 1 hour) so that the latest versions of packages are fetched.
 
+## Nex in version 1.5.x
+
+Added support for using a http proxy (note: not a [Socks5](http://en.wikipedia.org/wiki/SOCKS) proxy). This can be configured either via the config file or via the `http_proxy` environment variable, see the config at the end for an example. Thanks @migounette! As I am not using a proxy myself, please report any issues via GH (pull requests welcome!).
+
 ## New in version 1.4.x
 
 Bug fixes and improvements:
@@ -120,7 +124,6 @@ var path = require('path'),
 
 module.exports = {
   // Logging config
-
   loggingOpts: {
     // Print to stdout with colors
     logToConsole: true,
@@ -149,7 +152,7 @@ module.exports = {
   // Note: if you want to use `npm star` and other methods which update
   // npm metadata, you will need to set cacheAge to 0. npm generally wants the latest
   // package metadata version so caching package metadata will interfere with it.
-  //
+
   // Recommended setting: 0
   cacheAge: 0,
 
@@ -171,9 +174,16 @@ module.exports = {
   remoteUrl: 'https://registry.npmjs.org/',
   // bind port and host
   port: 8080,
-  host: '0.0.0.0'
-};
+  host: '0.0.0.0',
 
+  // Proxy config
+  // You can also configure this using the http_proxy and https_proxy environment variables
+  // cf. https://wiki.archlinux.org/index.php/proxy_settings
+  proxy: {
+    // http: 'http://1.2.3.4:80/',
+    // https: 'http://4.3.2.1:80/'
+  }
+};
 ````
 
 ## Caching logic
