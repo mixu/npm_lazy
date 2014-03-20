@@ -11,7 +11,16 @@ A lazy local cache for npm
 - Lazy caching: When a package is requested the first time, it is cached locally. No explicit need to manage packages or replication.
 - Metadata is expired periodically (default: 1 hour) so that the latest versions of packages are fetched.
 
-## Nex in version 1.5.x
+Here are all the ways in which npm_lazy is resilient to registry failures:
+
+- All HTTP requests are retried.
+- All HTTP requests are subject to a maximum fetch timeout (default: 5000 ms). If this fails, the request is retried (or failed).
+- Invalid responses are rejected and retried:
+  - Tarfiles are checked against the expected shasum, and cached forever if they match; if not, they are retried.
+  - Metadata files must parse as JSON; if not, they are retried.
+- Metadata files are never discarded until a newer version can be fetched successfully. If the JSON metadata is older than `cacheAge` (default: 1 hour), we will attempt to contact the registry first. However, if contacting the registry fails, then the old version of the metadata is sent instead. This means that even when outages occur, you can install any package that has been installed at least once before.
+
+## New in version 1.5.x
 
 Added support for using a http proxy (note: not a [Socks5](http://en.wikipedia.org/wiki/SOCKS) proxy). This can be configured either via the config file or via the `http_proxy` environment variable, see the config at the end for an example. Thanks @migounette! As I am not using a proxy myself, please report any issues via GH (pull requests welcome!).
 
@@ -23,34 +32,9 @@ Bug fixes and improvements:
 - Fixed a bug which occurred when the package file on the registry was updated by the author without bumping the version, resulting in a checksum mismatch between the cached tarfile and the metadata. Thanks @univerio!
 - Added support for logging to file (`loggingOpts`). Thanks @Damiya!
 
-## New in version 1.3.x
+Check out the [changelog](changelog.md) for version history.
 
-`npm search` and other non-installation related npm queries are now proxied to the registry.
-
-Note that only package index metadata and package tarfiles are cached; all other endpoints are just a transparently proxied (e.g. you can always run `npm install` for cached packages but more exotic npm endpoints will not work if the registry is down; they will simply act like their non-npm_lazy equivalents).
-
-Also, note that if you intend to write through npm_lazy you must set `cacheAge` to `0` so that npm metadata is always refreshed because npm wants to know that you have the most recent package `_id` before it allows writing. This will still return cached data for package.json indexes needed for installation if the registry is down, but only after attempting to contact the registry (this seems like a decent, but not perfect compromise).
-
-## New in version 1.2.x
-
-Reworked the behavior with regards to index files, where npm_lazy would return a 500 even though it had an package.json file in it's cache once the maxRetries were exhausted if the file was considered to be up to date. The new/fixed behavior is to always fall back to the cached file.
-
-## New in version 1.x
-
-In response to the npm outage, I've made some improvements to npm_lazy. Previously, the primary use case was to prevent multiple servers in a large deploy from causing duplicate requests.
-
-The new version adds better caching support and resiliency to registry failures.
-
-Here are all the ways in which npm_lazy is resilient to registry failures:
-
-- All HTTP requests are retried.
-- All HTTP requests are subject to a maximum fetch timeout (default: 5000 ms). If this fails, the request is retried (or failed).
-- Invalid responses are rejected and retried:
-  - Tarfiles are checked against the expected shasum, and cached forever if they match; if not, they are retried.
-  - Metadata files must parse as JSON; if not, they are retried.
-- Metadata files are never discarded until a newer version can be fetched successfully. If the JSON metadata is older than `cacheAge` (default: 1 hour), we will attempt to contact the registry first. However, if contacting the registry fails, then the old version of the metadata is sent instead. This means that even when outages occur, you can install any package that has been installed at least once before.
-
-## Installation (updated in 1.1.x)
+## Installation
 
 v1.1.x adds a command called `npm_lazy` to make things even easier. Install via npm:
 
@@ -95,11 +79,13 @@ A few things that might be useful to know:
 - Start by running `npm cache clean` so that your local npm command will request every package you want at least once from npm_lazy.
 - Starting with v1.2.0, npm_lazy will only return a 500 error if it does not have specific file.
 - To clear out the npm_lazy cache, simply remove the cache directory and restart npm_lazy. npm_lazy prints out the cache location when it starts, and it defaults to `~/.npm_lazy`.
+- Note that only package index metadata and package tarfiles are cached; all other endpoints are just a transparently proxied (e.g. you can always run `npm install` for cached packages but more exotic npm endpoints will not work if the registry is down; they will simply act like their non-npm_lazy equivalents).
+- Also, note that if you intend to write through npm_lazy you must set `cacheAge` to `0` so that npm metadata is always refreshed because npm wants to know that you have the most recent package `_id` before it allows writing. This will still return cached data for package.json indexes needed for installation if the registry is down, but only after attempting to contact the registry (this seems like a decent, but not perfect compromise).
 - Restarting npm_lazy will clear the package.json metadata refresh timeout and the max retries counter. All cached entries, including package.json files and tarfiles are kept, so you can safely restart the server to expire the metadata `cacheAge` while retaining all cached artifacts.
 - npm_lazy works by rewriting the download URLs for package.json results, so old files from `npm shrinkwrap` may interfere with it since they may contain direct references to registry.npmjs.org. Make sure you clean up that stuff.
 - If you are using self-signed certs, set `rejectUnauthorized` to false in the config.
 
-### Resiliency to registry failures (new in 1.x!)
+### Resiliency to registry failures
 
 First, install a package successfully so that it is cached.
 
