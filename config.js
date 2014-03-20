@@ -53,5 +53,13 @@ module.exports = {
   remoteUrl: 'https://registry.npmjs.org/',
   // bind port and host
   port: 8080,
-  host: '0.0.0.0'
+  host: '0.0.0.0',
+
+  // Proxy config
+  // You can also configure this using the http_proxy and https_proxy environment variables
+  // cf. https://wiki.archlinux.org/index.php/proxy_settings
+  proxy: {
+    // http: 'http://1.2.3.4:80/',
+    // https: 'http://4.3.2.1:80/'
+  }
 };

@@ -1,6 +1,7 @@
 var http = require('http'),
     path = require('path'),
     fs = require('fs'),
+    url = require('url'),
     log = require('minilog')('app'),
 
     api = require('./lib/api.js'),
@@ -21,13 +22,36 @@ function start(config) {
     minilog.pipe(fs.createWriteStream(config.loggingOpts.filename));
   }
 
+  // parse proxy config, see https://wiki.archlinux.org/index.php/proxy_settings for an example
+  if (!config.proxy || !config.proxy.http || !config.proxy.https) {
+    config.proxy = {
+      http: (process.env.http_proxy ? process.env.http_proxy : config.proxy.http),
+      https: (process.env.https_proxy ? process.env.https_proxy : config.proxy.https)
+    };
+  }
+
+  if (config.proxy.http) {
+    if (!config.proxy.https) {
+        // fall back to assuming that both http and https use the same proxy
+        config.proxy.https = config.proxy.http;
+    }
+    // parse
+    if (typeof config.proxy.http === 'string') {
+      config.proxy.http = url.parse(config.proxy.http);
+    }
+    if (typeof config.proxy.https === 'string') {
+      config.proxy.https = url.parse(config.proxy.https);
+    }
+  }
+
   Resource.configure({
     cache: new Cache({ path: config.cacheDirectory }),
     logger: log,
     cacheAge: config.cacheAge,
     maxRetries: config.maxRetries,
     timeout: config.httpTimeout,
-    rejectUnauthorized: config.rejectUnauthorized
+    rejectUnauthorized: config.rejectUnauthorized,
+    proxy: config.proxy
   });
 
   var packageConfig = {
@@ -51,6 +75,22 @@ function start(config) {
 
   log.info('npm_lazy at', config.host, 'port', config.port);
   log.info('npm_lazy cache directory:', path.normalize(config.cacheDirectory));
+
+  // log the proxy config
+  Object.keys(config.proxy).forEach(function(proto) {
+    var conf = config.proxy[proto];
+    if(conf) {
+      log.info('Using ' + conf.protocol + '//' + conf.hostname + ':' + conf.port + ' to proxy ' + proto + ' requests.');
+    }
+  });
+
+  /*
+  Resource.get('http://www.lagado.com/proxy-test')._fetchTask(function(err, res) {
+    if(res) {
+      res.pipe(process.stdout);
+    }
+  });
+  */
 }
 
 
