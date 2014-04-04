@@ -24,6 +24,8 @@ Here are all the ways in which npm_lazy is resilient to registry failures:
 
 Added support for using a http proxy (note: not a [Socks5](http://en.wikipedia.org/wiki/SOCKS) proxy). This can be configured either via the config file or via the `http_proxy` environment variable, see the config at the end for an example. Thanks @migounette! As I am not using a proxy myself, please report any issues via GH (pull requests welcome!).
 
+Note: if you already have a proxy for npm, make sure you don't run into an issue where npm uses the proxy when accessing npm_lazy. You don't want to have `npm install -> proxy -> npm_lazy -> proxy`, but rather `npm install -> npm_lazy -> proxy` since your proxy probably doesn't know how to connect to npm_lazy. You will need to disable npm's internal proxy config, [see this comment for the details](https://github.com/mixu/npm_lazy/issues/30#issuecomment-39546977).
+
 ## New in version 1.4.x
 
 Bug fixes and improvements:
