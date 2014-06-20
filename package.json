@@ -19,7 +19,9 @@
     "microee": "0.0.5",
     "mixu_minimal": "0.0.1",
     "optimist": "~0.6.0",
-    "resolve": "~0.6.1"
+    "resolve": "~0.6.1",
+    "request": "^2.36.0"
+
   },
   "repository": {
     "type": "git",
