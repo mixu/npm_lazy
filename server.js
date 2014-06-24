@@ -19,7 +19,7 @@ function start(config) {
   }
 
   if (config.loggingOpts.logToFile) {
-    minilog.pipe(fs.createWriteStream(config.loggingOpts.filename));
+    minilog.pipe(fs.createWriteStream(config.loggingOpts.filename, {flags: 'w'}));
   }
 
   // parse proxy config, see https://wiki.archlinux.org/index.php/proxy_settings for an example
