@@ -19,7 +19,7 @@ Object.keys(meta).forEach(function(uri) {
     files.splice(index, 1);
   }
 
-  console.log('Cache check', uri, cache.lookup(uri, 'GET'));
+  console.log('Cache check', uri, cache.lookup(uri, 'GET').path);
 
 });
 
