@@ -33,7 +33,7 @@ module.exports = {
   // package metadata version so caching package metadata will interfere with it.
 
   // Recommended setting: 0
-  cacheAge: 0,
+  cacheAge: 60 * 60 * 1000,
 
   // Request config
 
