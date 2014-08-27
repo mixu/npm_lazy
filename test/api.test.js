@@ -13,9 +13,9 @@ var fs = require('fs'),
 
 var FakeCache = {};
 
-exports['given a server'] = {
+describe('given a server', function() {
 
-  before: function(done) {
+  before(function(done) {
     cache = new Cache({ path: __dirname + '/db' });
     Resource.configure({
       cache: cache
@@ -32,13 +32,13 @@ exports['given a server'] = {
     }).listen(9090, 'localhost', function() {
       done();
     });
-  },
+  });
 
-  after: function() {
+  after(function() {
     cache.clear();
-  },
+  });
 
-  'can GET a package index': function(done) {
+  it('can GET a package index', function(done) {
     this.timeout(60000); // because I'm tethering
     Client
       .get('http://localhost:9090/requireincontext')
@@ -53,9 +53,9 @@ exports['given a server'] = {
           done();
         });
       });
-  },
+  });
 
-  'can GET a package version': function(done) {
+  it('can GET a package version', function(done) {
     this.timeout(60000);
     Client
       .get('http://localhost:9090/requireincontext/0.0.1')
@@ -70,10 +70,10 @@ exports['given a server'] = {
           done();
         });
       });
-  },
+  });
 
-  'self-signed': {
-    before: function() {
+  describe('self-signed', function() {
+    before(function() {
       // Note: this test depends on the fact that isaacs.iriscouch.com/ exists
       // and that it keeps serving the cert for registry.npmjs.org which
       // obviously fails validation
@@ -86,18 +86,18 @@ exports['given a server'] = {
       Package.configure({
         remoteUrl: 'https://isaacs.iriscouch.com/registry/_design/app/_rewrite/'
       });
-    },
+    });
 
-    after: function() {
+    after(function() {
       Resource.configure({
         rejectUnauthorized: true
       });
       Package.configure({
         remoteUrl: 'http://registry.npmjs.org/'
       });
-    },
+    });
 
-    'can GET a package index which has a self-signed cert': function(done) {
+    it('can GET a package index which has a self-signed cert', function(done) {
       this.timeout(60000); // because I'm tethering
       Client
         .get('http://localhost:9090/microee')
@@ -114,10 +114,10 @@ exports['given a server'] = {
             done();
           });
         });
-    }
-  },
+    });
+  });
 
-  'can use npm install requireincontext': function(done) {
+  it('can use npm install requireincontext', function(done) {
     var tmpdir = __dirname + '/tmp/';
     this.timeout(60000);
     [tmpdir + '/node_modules/requireincontext/index.js',
@@ -143,23 +143,7 @@ exports['given a server'] = {
         done();
       });
     });
-  }
-
-};
-
-// if this module is the script being run, then run the tests:
-if (module == require.main) {
-  var mocha = require('child_process').spawn('mocha', [
-    '--colors', '--ui', 'exports', '--reporter', 'spec', __filename
-  ]);
-  mocha.on('error', function() {
-     console.log('Failed to start child process. You need mocha: `npm install -g mocha`');
   });
-  mocha.stderr.on('data', function(data) {
-    if (/^execvp\(\)/.test(data)) {
-     console.log('Failed to start child process. You need mocha: `npm install -g mocha`');
-    }
-  });
-  mocha.stdout.pipe(process.stdout);
-  mocha.stderr.pipe(process.stderr);
-}
+
+});
+

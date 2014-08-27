@@ -7,9 +7,9 @@ var fs = require('fs'),
     Cache = require('../lib/cache.js'),
     Resource = require('../lib/resource.js');
 
-exports['given a package'] = {
+describe('given a package', function() {
 
-  before: function(done) {
+  before(function(done) {
     cache = new Cache({ path: __dirname + '/tmp' });
     Resource.configure({
       cache: cache
@@ -21,9 +21,9 @@ exports['given a package'] = {
       externalUrl: 'http://localhost:8080'
     });
     done();
-  },
+  });
 
-  'can fetch a package index': function(done) {
+  it('can fetch a package index', function(done) {
     this.timeout(10000);
 
     // Note: this goes out the the real reg!
@@ -36,9 +36,9 @@ exports['given a package'] = {
       assert.deepEqual(actual, expected);
       done();
     });
-  },
+  });
 
-  'can fetch a specific version in the index': function(done) {
+  it('can fetch a specific version in the index', function(done) {
     Package.getVersion('foo', '1.0.0', function(err, json) {
       var expected = JSON.parse(
         fs.readFileSync(__dirname + '/db/foo.json')
@@ -47,9 +47,9 @@ exports['given a package'] = {
       assert.deepEqual(json, expected);
       done();
     });
-  },
+  });
 
-  'can fetch a tarfile': function(done) {
+  it('can fetch a tarfile', function(done) {
     var out = __dirname + '/tmp/foo.tgz';
     if (fs.existsSync(out)) {
       fs.unlinkSync(out);
@@ -66,30 +66,13 @@ exports['given a package'] = {
                 })
               );
             });
-  },
+  });
 
-  'can check file sha': function(done) {
+  it('can check file sha', function(done) {
     verify.check(__dirname + '/fixtures/requireincontext/requireincontext-0.0.2.tgz', function(err, actual) {
       assert.notEqual('4a77c6f7ccbd43e095d9fc6c943e53707e042f41', actual);
       assert.equal('3bb7b8a676e95a33a0f28f081cf860176b8f67c7', actual);
       done();
     });
-  }
-
-};
-
-// if this module is the script being run, then run the tests:
-if (module == require.main) {
-  var mocha = require('child_process').spawn('mocha',
-    ['--colors', '--ui', 'exports', '--reporter', 'spec', __filename]);
-  mocha.on('error', function() {
-     console.log('Failed to start child process. You need mocha: `npm install -g mocha`');
   });
-  mocha.stderr.on('data', function(data) {
-    if (/^execvp\(\)/.test(data)) {
-     console.log('Failed to start child process. You need mocha: `npm install -g mocha`');
-    }
-  });
-  mocha.stdout.pipe(process.stdout);
-  mocha.stderr.pipe(process.stderr);
-}
+});

@@ -53,9 +53,9 @@ function read(fullpath) {
   return fs.readFileSync(fullpath).toString();
 }
 
-exports['resource tests'] = {
+describe('resource tests', function() {
 
-  before: function() {
+  before(function() {
 
     cache.clear();
 
@@ -90,24 +90,24 @@ exports['resource tests'] = {
 
     // change the _fetchTask
     Resource.prototype._fetchTask = mockFetch;
-  },
+  });
 
-  'Resource.get() will only return a single instance for a given url': function() {
+  it('Resource.get() will only return a single instance for a given url', function() {
     assert.strictEqual(Resource.get('foo'), Resource.get('foo'));
-  },
+  });
 
-  '.tgz has type tar, others have type index': function() {
+  it('.tgz has type tar, others have type index', function() {
     assert.equal(Resource.get('http://foo/foo.tgz').type, 'tar');
     assert.equal(Resource.get('http://foo/foo/').type, 'index');
-  },
+  });
 
-  '.tgz get packagename': function() {
+  it('.tgz get packagename', function() {
     assert.equal(Resource.get('http://registry.npmjs.org/foo/-/foo-1.0.0.tgz').getPackageName(), 'foo');
-  },
+  });
 
-  'index resource': {
+  describe('index resource', function() {
 
-    'if it exists and is up to date, success': function(done) {
+    it('if it exists and is up to date, success', function(done) {
       var r = Resource.get('http://registry.npmjs.org/local-cached');
 
       r.getReadablePath(function(err, data) {
@@ -115,9 +115,9 @@ exports['resource tests'] = {
         assert.equal(JSON.parse(read(data)).name, 'local-cached');
         done();
       });
-    },
+    });
 
-    'if it does not exist and the response is a JSON object, success': function(done) {
+    it('if it does not exist and the response is a JSON object, success', function(done) {
       var r = Resource.get('http://registry.npmjs.org/remote-valid');
 
       r.getReadablePath(function(err, data) {
@@ -125,9 +125,9 @@ exports['resource tests'] = {
         assert.equal(JSON.parse(read(data)).name, 'remote-valid');
         done();
       });
-    },
+    });
 
-    'if it does not exist and the response is not a JSON object, retry': function(done) {
+    it('if it does not exist and the response is not a JSON object, retry', function(done) {
       var r = Resource.get('http://registry.npmjs.org/remote-retry');
 
       r.getReadablePath(function(err, data) {
@@ -135,9 +135,9 @@ exports['resource tests'] = {
         assert.equal(JSON.parse(read(data)).name, 'remote-retry');
         done();
       });
-    },
+    });
 
-    'if retries > maxRetries, throw a error': function(done) {
+    it('if retries > maxRetries, throw a error', function(done) {
       var r = Resource.get('http://registry.npmjs.org/remote-invalid');
 
       r.getReadablePath(function(err, data) {
@@ -145,9 +145,9 @@ exports['resource tests'] = {
         assert.ok(!read(data));
         done();
       });
-    },
+    });
 
-    'if the resource exists but is outdated, fetch a new version and return it': function(done) {
+    it('if the resource exists but is outdated, fetch a new version and return it', function(done) {
       var r = Resource.get('http://registry.npmjs.org/local-outdated');
 
       r.isUpToDate = function() { return false; };
@@ -156,9 +156,9 @@ exports['resource tests'] = {
         assert.equal(JSON.parse(read(data)).name, 'uptodate');
         done();
       });
-    },
+    });
 
-    'if the resource is outdated and the fetch fails, return the cached version': function(done) {
+    it('if the resource is outdated and the fetch fails, return the cached version', function(done) {
       var r = Resource.get('http://registry.npmjs.org/local-outdated-fail');
 
       r.isUpToDate = function() { return false; };
@@ -167,26 +167,26 @@ exports['resource tests'] = {
         assert.equal(JSON.parse(read(data)).name, 'outdated-fail');
         done();
       });
-    },
+    });
 
-    'with granular control': {
+    describe('with granular control', function() {
 
-      before: function() {
+      before(function() {
         Resource.prototype._fetchTask = function() { };
         oldIsUpToDate = Resource.prototype.isUpToDate;
         Resource.prototype.isUpToDate = function() {
           return false;
         };
         Resource.configure({ timeout: 10 });
-      },
+      });
 
-      after: function() {
+      after(function() {
         Resource.prototype._fetchTask = mockFetch;
         Resource.prototype.isUpToDate = oldIsUpToDate;
         Resource.configure({ timeout: 2000 });
-      },
+      });
 
-      'if the fetch times out, use the cached version': function(done) {
+      it('if the fetch times out, use the cached version', function(done) {
         this.timeout(10000);
         var r = Resource.get('http://registry.npmjs.org/local-cached'),
             errors = [];
@@ -202,9 +202,9 @@ exports['resource tests'] = {
           assert.equal(JSON.parse(read(data)).name, 'local-cached');
           done();
         });
-      },
+      });
 
-      'if the fetch times out, and the object is not cached, throw': function(done) {
+      it('if the fetch times out, and the object is not cached, throw', function(done) {
         this.timeout(10000);
         var r = Resource.get('http://registry.npmjs.org/local-missing'),
             errors = [];
@@ -219,9 +219,9 @@ exports['resource tests'] = {
           assert.ok(!read(data));
           done();
         });
-      },
+      });
 
-      'when the resource is already fetching, block all pending requests': function(done) {
+      it('when the resource is already fetching, block all pending requests', function(done) {
         this.timeout(10000);
         Resource.prototype._fetchTask = function(onDone) {
           var u = this.url;
@@ -245,15 +245,13 @@ exports['resource tests'] = {
             done();
           }
         }
-      }
+      });
+    });
+  });
 
-    }
+  describe('tar resource', function() {
 
-  },
-
-  'tar resource': {
-
-    'if it exists, success': function(done) {
+    it('if it exists, success', function(done) {
       var r = Resource.get('http://registry.npmjs.org/remote-cached/-/remote-cached.tgz');
 
       r.getReadablePath(function(err, data) {
@@ -261,9 +259,9 @@ exports['resource tests'] = {
         assert.equal(read(data), 'remote-cached-tar');
         done();
       });
-    },
+    });
 
-    'when the response passes checksum, success': function(done) {
+    it('when the response passes checksum, success', function(done) {
       var r = Resource.get('http://registry.npmjs.org/remote-valid/-/remote-valid.tgz');
 
       r.getReadablePath(function(err, data) {
@@ -271,9 +269,9 @@ exports['resource tests'] = {
         assert.equal(read(data).trim(), 'remote-valid-tar');
         done();
       });
-    },
+    });
 
-    'when the response fails checksum, retry': function(done) {
+    it('when the response fails checksum, retry', function(done) {
       var r = Resource.get('http://registry.npmjs.org/remote-retry-3/-/remote-retry-3.tgz');
 
       r.getReadablePath(function(err, data) {
@@ -281,9 +279,9 @@ exports['resource tests'] = {
         assert.equal(read(data).trim(), 'remote-retry-valid-tar');
         done();
       });
-    },
+    });
 
-    'if retries > maxRetries, throw a error': function(done) {
+    it('if retries > maxRetries, throw a error', function(done) {
       var r = Resource.get('http://registry.npmjs.org/remote-retries/-/remote-retries.tgz');
 
       r.getReadablePath(function(err, data) {
@@ -291,22 +289,22 @@ exports['resource tests'] = {
         assert.ok(!read(data));
         done();
       });
-    },
+    });
 
-    'with granular control': {
+    describe('with granular control', function() {
 
-      before: function() {
+      before(function() {
         Resource.prototype._fetchTask = function() { };
         oldIsUpToDate = Resource.prototype.isUpToDate;
         Resource.configure({ timeout: 10 });
-      },
+      });
 
-      after: function() {
+      after(function() {
         Resource.prototype._fetchTask = mockFetch;
         Resource.configure({ timeout: 2000 });
-      },
+      });
 
-      'if the fetch times out, and the object is not cached, throw': function(done) {
+      it('if the fetch times out, and the object is not cached, throw', function(done) {
         this.timeout(10000);
         var r = Resource.get('http://registry.npmjs.org/remote-missing/-/remote-missing.tgz'),
             errors = [];
@@ -321,9 +319,9 @@ exports['resource tests'] = {
           assert.ok(!read(data));
           done();
         });
-      },
+      });
 
-      'when the resource is already fetching, block all pending requests': function(done) {
+      it('when the resource is already fetching, block all pending requests', function(done) {
         this.timeout(10000);
         Resource.prototype._fetchTask = function(onDone) {
           var u = this.url;
@@ -347,27 +345,7 @@ exports['resource tests'] = {
             done();
           }
         }
-      }
-
-    }
-
-  }
-
-};
-
-// if this module is the script being run, then run the tests:
-if (module == require.main) {
-  var mocha = require('child_process').spawn('mocha',
-    ['--colors', '--ui', 'exports', '--bail', '--reporter', 'spec', __filename]);
-  mocha.on('error', function() {
-     console.log('Failed to start child process. You need mocha: `npm install -g mocha`');
+      });
+    });
   });
-  mocha.stderr.on('data', function(data) {
-    if (/^execvp\(\)/.test(data)) {
-     console.log('Failed to start child process. You need mocha: `npm install -g mocha`');
-    }
-  });
-  mocha.stdout.pipe(process.stdout);
-  mocha.stderr.pipe(process.stderr);
-}
-
+});
