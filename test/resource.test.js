@@ -4,46 +4,12 @@ var fs = require('fs'),
     assert = require('assert'),
     npmLazy = require('npm_lazy'),
     Resource = npmLazy.Resource,
-    Cache = require('../lib/cache.js');
-
-var cache = new Cache({ path: __dirname + '/db' }),
-        remoteDir = __dirname + '/fixtures/remote',
-        localDir = __dirname + '/fixtures/local',
-        oldIsUpToDate;
+    Cache = require('../lib/cache.js'),
+    fixture = require('file-fixture');
 
 function getTargetBasename(uri) {
   var parts = url.parse(uri);
   return path.basename(path.extname(parts.pathname) == '.tgz' ? parts.pathname : parts.pathname + '.json');
-}
-
-function mockFetch(onDone) {
-  var target = getTargetBasename(this.url),
-      targetPath = remoteDir + '/' + target;
-
-  console.log('remote-read:', this.url, 'from', targetPath);
-
-  if (target == 'remote-retries.tgz') {
-    return onDone(new Error('Fake error'));
-  }
-
-  if (!fs.existsSync(targetPath)) {
-    throw new Error('Path does not exist ' + targetPath);
-  }
-
-  // special case remote-retry: should succeed on 3rd try
-  if (target == 'remote-retry.json' && this.retries == 1) {
-    // return remote-retry-valid.json
-    return onDone(null, fs.createReadStream(remoteDir + '/remote-retry-valid.json'));
-  }
-  if (target == 'remote-retry-3.tgz' && this.retries == 1) {
-    // return remote-retry-valid.json
-    return onDone(null, fs.createReadStream(remoteDir + '/remote-retry-3-valid.tgz'));
-  }
-  // this works by reading the corresponding file from fixtures/remote
-
-  // console.log(remoteDir + '/' + target);
-
-  return onDone(null, fs.createReadStream(targetPath));
 }
 
 function read(fullpath) {
@@ -54,8 +20,112 @@ function read(fullpath) {
 }
 
 describe('resource tests', function() {
+  var cache,
+      remoteDir,
+      localDir,
+      oldIsUpToDate;
+
+  function mockFetch(onDone) {
+    var target = getTargetBasename(this.url),
+        targetPath = remoteDir + '/' + target;
+
+    console.log('remote-read:', this.url, 'from', targetPath);
+
+    if (target == 'remote-retries.tgz') {
+      return onDone(new Error('Fake error'));
+    }
+
+    if (!fs.existsSync(targetPath)) {
+      throw new Error('Path does not exist ' + targetPath);
+    }
+
+    // special case remote-retry: should succeed on 3rd try
+    if (target == 'remote-retry.json' && this.retries == 1) {
+      // return remote-retry-valid.json
+      return onDone(null, fs.createReadStream(remoteDir + '/remote-retry-valid.json'));
+    }
+    if (target == 'remote-retry-3.tgz' && this.retries == 1) {
+      // return remote-retry-valid.json
+      return onDone(null, fs.createReadStream(remoteDir + '/remote-retry-3-valid.tgz'));
+    }
+    // this works by reading the corresponding file from fixtures/remote
+
+    // console.log(remoteDir + '/' + target);
+
+    return onDone(null, fs.createReadStream(targetPath));
+  }
 
   before(function() {
+    localDir = fixture.dir({
+      'local-cached.json': '{ "name": "local-cached" }',
+      'local-outdated-fail.json': '{ "name": "outdated-fail" }',
+      'local-outdated.json': '{ "name": "outdated" }',
+      'remote-cached.tgz': 'remote-cached-tar'
+    });
+
+    remoteDir = fixture.dir({
+      'local-cached.json': '{ "name": "local-cached" }',
+      'local-outdated-fail.json': 'aaaa',
+      'local-outdated.json': '{ "name": "uptodate" }',
+      'remote-cached.json': JSON.stringify({
+        "name": "remote-cached",
+        "versions": {
+          "0.0.1": {
+            "name": "remote-cached",
+            "dist": {
+              "tarball": "http://foo/remote-cached.tgz",
+              "shasum": "1ffc692160f4cea33b3489ac0b9b281eb87b03eb"
+            }
+          }
+        }
+      }),
+      'remote-invalid.json': 'remote-invalid',
+      'remote-retry-3-valid.tgz': 'remote-retry-valid-tar\n',
+      'remote-retry-3.json': JSON.stringify({
+        "name": "remote-valid",
+        "versions": {
+          "0.0.1": {
+            "name": "remote-valid",
+            "dist": {
+              "tarball": "http://foo/remote-retry-3.tgz",
+              "shasum": "7c92179e6b1cf5d2106f145f5a748d84f40d8d39",
+              "comment": "This is the SHA for remote-retry-3-valid.tgz and not for remote-retry-3.tgz"
+            }
+          }
+        }
+      }),
+      'remote-retry-3.tgz': 'this file has a bad checksum\n',
+      'remote-retry-valid.json': '{ "name": "remote-retry" }\n',
+      'remote-retry.json': 'aaaa',
+      'remote-valid.json': JSON.stringify({
+        "name": "remote-valid",
+        "versions": {
+          "0.0.1": {
+            "name": "remote-valid",
+            "dist": {
+              "tarball": "http://foo/remote-valid.tgz",
+              "shasum": "19da7c27e374042b357808fb914eb8a04b6a6f28"
+            }
+          }
+        }
+      }),
+      'remote-valid.tgz': 'remote-valid-tar\n\n\n',
+      'remote-valid2.json': JSON.stringify({
+        "name": "remote-valid2",
+        "versions": {
+          "0.0.1": {
+            "name": "remote-valid2",
+            "dist": {
+              "tarball": "http://foo/remote-valid2.tgz",
+              "shasum": "19da7c27e374042b357808fb914eb8a04b6a6f28"
+            }
+          }
+        }
+      }),
+      'remote-valid2.tgz': 'remote-valid-tar\n\n\n'
+    });
+
+    cache = new Cache({ path: __dirname + '/db' });
 
     cache.clear();
 
