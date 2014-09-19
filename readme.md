@@ -20,6 +20,15 @@ Here are all the ways in which npm_lazy is resilient to registry failures:
   - Metadata files must parse as JSON; if not, they are retried.
 - Metadata files are never discarded until a newer version can be fetched successfully. If the JSON metadata is older than `cacheAge` (default: 1 hour), we will attempt to contact the registry first. However, if contacting the registry fails, then the old version of the metadata is sent instead. This means that even when outages occur, you can install any package that has been installed at least once before.
 
+## New in version 1.6.x
+
+- improved etags handling (thanks @CL0SeY)
+- use mikeal/request to improve compatibility with Windows-world proxies (thanks @garytaylor)
+- fixed an error where hashing a package would incorrectly report a failure (thanks @kleini)
+- fixed tests (thanks @CL0SeY) and converted tests to use Mocha BDD style
+- 302 support (thanks @guig)
+- fixed a broken reference (thanks @kwizzn)
+
 ## New in version 1.5.x
 
 Added support for using a http proxy (note: not a [Socks5](http://en.wikipedia.org/wiki/SOCKS) proxy). This can be configured either via the config file or via the `http_proxy` environment variable, see the config at the end for an example. Thanks @migounette! As I am not using a proxy myself, please report any issues via GH (pull requests welcome!).
