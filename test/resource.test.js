@@ -25,6 +25,12 @@ describe('resource tests', function() {
       localDir,
       oldIsUpToDate;
 
+  function fakeResponse(filePath, statusCode) {
+    var stream = fs.createReadStream(filePath);
+    stream.statusCode = statusCode || 200;
+    return stream;
+  }
+  
   function mockFetch(onDone) {
     var target = getTargetBasename(this.url),
         targetPath = remoteDir + '/' + target;
@@ -42,17 +48,17 @@ describe('resource tests', function() {
     // special case remote-retry: should succeed on 3rd try
     if (target == 'remote-retry.json' && this.retries == 1) {
       // return remote-retry-valid.json
-      return onDone(null, fs.createReadStream(remoteDir + '/remote-retry-valid.json'));
+      return onDone(null, fakeResponse(remoteDir + '/remote-retry-valid.json'));
     }
     if (target == 'remote-retry-3.tgz' && this.retries == 1) {
       // return remote-retry-valid.json
-      return onDone(null, fs.createReadStream(remoteDir + '/remote-retry-3-valid.tgz'));
+      return onDone(null, fakeResponse(remoteDir + '/remote-retry-3-valid.tgz'));
     }
     // this works by reading the corresponding file from fixtures/remote
 
     // console.log(remoteDir + '/' + target);
 
-    return onDone(null, fs.createReadStream(targetPath));
+    return onDone(null, fakeResponse(targetPath));
   }
 
   before(function() {
@@ -181,7 +187,7 @@ describe('resource tests', function() {
       var r = Resource.get('http://registry.npmjs.org/local-cached');
 
       r.getReadablePath(function(err, data) {
-        assert.ok(!err);
+        assert.ok(!err, err);
         assert.equal(JSON.parse(read(data)).name, 'local-cached');
         done();
       });
@@ -201,6 +207,8 @@ describe('resource tests', function() {
       var r = Resource.get('http://registry.npmjs.org/remote-retry');
 
       r.getReadablePath(function(err, data) {
+        console.log('err: ', err);
+        console.log('data: ', data);
         assert.ok(!err);
         assert.equal(JSON.parse(read(data)).name, 'remote-retry');
         done();
@@ -296,7 +304,7 @@ describe('resource tests', function() {
         Resource.prototype._fetchTask = function(onDone) {
           var u = this.url;
           setTimeout(function() {
-            onDone(null, fs.createReadStream(remoteDir + '/' + getTargetBasename(u)));
+            onDone(null, fakeResponse(remoteDir + '/' + getTargetBasename(u)));
           }, 50);
         };
 
@@ -308,7 +316,7 @@ describe('resource tests', function() {
         r2.getReadablePath(onDone);
 
         function onDone(err, data) {
-          assert.ok(!err);
+          assert.ok(!err, err);
           assert.equal(JSON.parse(read(data)).name, 'remote-valid');
           counter++;
           if (counter == 2) {
@@ -396,7 +404,7 @@ describe('resource tests', function() {
         Resource.prototype._fetchTask = function(onDone) {
           var u = this.url;
           setTimeout(function() {
-            onDone(null, fs.createReadStream(remoteDir + '/' + getTargetBasename(u)));
+            onDone(null, fakeResponse(remoteDir + '/' + getTargetBasename(u)));
           }, 50);
         };
 
