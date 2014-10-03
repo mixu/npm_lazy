@@ -30,7 +30,7 @@ describe('resource tests', function() {
     stream.statusCode = statusCode || 200;
     return stream;
   }
-  
+
   function mockFetch(onDone) {
     var target = getTargetBasename(this.url),
         targetPath = remoteDir + '/' + target;
@@ -74,13 +74,13 @@ describe('resource tests', function() {
       'local-outdated-fail.json': 'aaaa',
       'local-outdated.json': '{ "name": "uptodate" }',
       'remote-cached.json': JSON.stringify({
-        "name": "remote-cached",
-        "versions": {
-          "0.0.1": {
-            "name": "remote-cached",
-            "dist": {
-              "tarball": "http://foo/remote-cached.tgz",
-              "shasum": "1ffc692160f4cea33b3489ac0b9b281eb87b03eb"
+        'name': 'remote-cached',
+        'versions': {
+          '0.0.1': {
+            'name': 'remote-cached',
+            'dist': {
+              'tarball': 'http://foo/remote-cached.tgz',
+              'shasum': '1ffc692160f4cea33b3489ac0b9b281eb87b03eb'
             }
           }
         }
@@ -88,14 +88,14 @@ describe('resource tests', function() {
       'remote-invalid.json': 'remote-invalid',
       'remote-retry-3-valid.tgz': 'remote-retry-valid-tar\n',
       'remote-retry-3.json': JSON.stringify({
-        "name": "remote-valid",
-        "versions": {
-          "0.0.1": {
-            "name": "remote-valid",
-            "dist": {
-              "tarball": "http://foo/remote-retry-3.tgz",
-              "shasum": "7c92179e6b1cf5d2106f145f5a748d84f40d8d39",
-              "comment": "This is the SHA for remote-retry-3-valid.tgz and not for remote-retry-3.tgz"
+        'name': 'remote-valid',
+        'versions': {
+          '0.0.1': {
+            'name': 'remote-valid',
+            'dist': {
+              'tarball': 'http://foo/remote-retry-3.tgz',
+              'shasum': '7c92179e6b1cf5d2106f145f5a748d84f40d8d39',
+              'comment': 'This is the SHA for remote-retry-3-valid.tgz and not for remote-retry-3.tgz'
             }
           }
         }
@@ -104,26 +104,26 @@ describe('resource tests', function() {
       'remote-retry-valid.json': '{ "name": "remote-retry" }\n',
       'remote-retry.json': 'aaaa',
       'remote-valid.json': JSON.stringify({
-        "name": "remote-valid",
-        "versions": {
-          "0.0.1": {
-            "name": "remote-valid",
-            "dist": {
-              "tarball": "http://foo/remote-valid.tgz",
-              "shasum": "19da7c27e374042b357808fb914eb8a04b6a6f28"
+        'name': 'remote-valid',
+        'versions': {
+          '0.0.1': {
+            'name': 'remote-valid',
+            'dist': {
+              'tarball': 'http://foo/remote-valid.tgz',
+              'shasum': '19da7c27e374042b357808fb914eb8a04b6a6f28'
             }
           }
         }
       }),
       'remote-valid.tgz': 'remote-valid-tar\n\n\n',
       'remote-valid2.json': JSON.stringify({
-        "name": "remote-valid2",
-        "versions": {
-          "0.0.1": {
-            "name": "remote-valid2",
-            "dist": {
-              "tarball": "http://foo/remote-valid2.tgz",
-              "shasum": "19da7c27e374042b357808fb914eb8a04b6a6f28"
+        'name': 'remote-valid2',
+        'versions': {
+          '0.0.1': {
+            'name': 'remote-valid2',
+            'dist': {
+              'tarball': 'http://foo/remote-valid2.tgz',
+              'shasum': '19da7c27e374042b357808fb914eb8a04b6a6f28'
             }
           }
         }

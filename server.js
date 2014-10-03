@@ -79,7 +79,7 @@ function start(config) {
   // log the proxy config
   Object.keys(config.proxy).forEach(function(proto) {
     var conf = config.proxy[proto];
-    if(conf) {
+    if (conf) {
       log.info('Using ' + conf.protocol + '//' + conf.hostname + ':' + conf.port + ' to proxy ' + proto + ' requests.');
     }
   });
