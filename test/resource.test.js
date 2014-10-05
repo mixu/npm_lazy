@@ -19,6 +19,19 @@ function read(fullpath) {
   return fs.readFileSync(fullpath).toString();
 }
 
+function readStream(stream, done) {
+  var resp = '';
+  if (!stream) {
+    done(null);
+  }
+  stream.on('data', function(content) {
+    resp += content;
+  });
+  stream.on('end', function() {
+    done(resp);
+  });
+}
+
 describe('resource tests', function() {
   var cache,
       remoteDir,
@@ -57,6 +70,9 @@ describe('resource tests', function() {
     // this works by reading the corresponding file from fixtures/remote
 
     // console.log(remoteDir + '/' + target);
+    if (target.indexOf('500.json') > -1) {
+      return onDone(null, fakeResponse(targetPath, 500));
+    }
 
     return onDone(null, fakeResponse(targetPath));
   }
@@ -65,6 +81,7 @@ describe('resource tests', function() {
     localDir = fixture.dir({
       'local-cached.json': '{ "name": "local-cached" }',
       'local-outdated-fail.json': '{ "name": "outdated-fail" }',
+      'local-outdated-fail-500.json': '{ "name": "outdated-fail-500" }',
       'local-outdated.json': '{ "name": "outdated" }',
       'remote-cached.tgz': 'remote-cached-tar'
     });
@@ -72,6 +89,7 @@ describe('resource tests', function() {
     remoteDir = fixture.dir({
       'local-cached.json': '{ "name": "local-cached" }',
       'local-outdated-fail.json': 'aaaa',
+      'local-outdated-fail-500.json': '{ "error": "Whoops something went wrong" }',
       'local-outdated.json': '{ "name": "uptodate" }',
       'remote-cached.json': JSON.stringify({
         'name': 'remote-cached',
@@ -128,7 +146,8 @@ describe('resource tests', function() {
           }
         }
       }),
-      'remote-valid2.tgz': 'remote-valid-tar\n\n\n'
+      'remote-valid2.tgz': 'remote-valid-tar\n\n\n',
+      'remote-500.json': '{ "error": "remote-error" }'
     });
 
     cache = new Cache({ path: __dirname + '/db' });
@@ -243,6 +262,17 @@ describe('resource tests', function() {
       r.getReadablePath(function(err, data) {
         assert.ok(!err);
         assert.equal(JSON.parse(read(data)).name, 'outdated-fail');
+        done();
+      });
+    });
+
+    it('if the resource is outdated and the fetch responds with error 500, return the cached version', function(done) {
+      var r = Resource.get('http://registry.npmjs.org/local-outdated-fail-500');
+
+      r.isUpToDate = function() { return false; };
+      r.getReadablePath(function(err, data) {
+        assert.ok(!err, err);
+        assert.equal(JSON.parse(read(data)).name, 'outdated-fail-500', read(data));
         done();
       });
     });
@@ -369,6 +399,18 @@ describe('resource tests', function() {
       });
     });
 
+    it('if retries > maxRetries on 500, throw a error', function(done) {
+      var r = Resource.get('http://registry.npmjs.org/remote-500');
+
+      r.getReadablePath(function(err, data) {
+        assert.ok(err);
+        readStream(data, function(resp) {
+          assert.equal(JSON.parse(resp).error, 'remote-error');
+          done();
+        });
+      });
+    });
+      
     describe('with granular control', function() {
 
       before(function() {
