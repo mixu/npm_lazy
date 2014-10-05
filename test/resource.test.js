@@ -23,6 +23,7 @@ function readStream(stream, done) {
   var resp = '';
   if (!stream) {
     done(null);
+    return;
   }
   stream.on('data', function(content) {
     resp += content;
@@ -70,8 +71,14 @@ describe('resource tests', function() {
     // this works by reading the corresponding file from fixtures/remote
 
     // console.log(remoteDir + '/' + target);
+    if (target.indexOf('404.json') > -1) {
+      return onDone(null, fakeResponse(targetPath, 404));
+    }
     if (target.indexOf('500.json') > -1) {
       return onDone(null, fakeResponse(targetPath, 500));
+    }
+    if (target.indexOf('503.json') > -1) {
+      return onDone(null, fakeResponse(targetPath, 503));
     }
 
     return onDone(null, fakeResponse(targetPath));
@@ -147,6 +154,9 @@ describe('resource tests', function() {
         }
       }),
       'remote-valid2.tgz': 'remote-valid-tar\n\n\n',
+      'remote-404.json': '{"error":"not_found","reason":"document not found"}',
+      'remote-nocache-404.json': '{"error":"not_found","reason":"document not found"}',
+      'remote-503.json': '{ "error": "remote-error" }',
       'remote-500.json': '{ "error": "remote-error" }'
     });
 
@@ -244,6 +254,17 @@ describe('resource tests', function() {
       });
     });
 
+    it('if retries > maxRetries on 500, throw a error', function(done) {
+      var r = Resource.get('http://registry.npmjs.org/remote-503');
+
+      r.getReadablePath(function(err, data) {
+        assert.ok(err);
+        assert.ok(err.content);
+        assert.equal(JSON.parse(err.content).error, 'remote-error', err.content);
+        done();
+      });
+    });
+
     it('if the resource exists but is outdated, fetch a new version and return it', function(done) {
       var r = Resource.get('http://registry.npmjs.org/local-outdated');
 
@@ -274,6 +295,36 @@ describe('resource tests', function() {
         assert.ok(!err, err);
         assert.equal(JSON.parse(read(data)).name, 'outdated-fail-500', read(data));
         done();
+      });
+    });
+
+    it('should respond with 404 with upstream response', function(done) {
+      var r = Resource.get('http://registry.npmjs.org/remote-404');
+
+      r.getReadablePath(function(err, data) {
+        assert.ok(err);
+        assert.ok(err.content);
+        assert.equal(JSON.parse(err.content).error, 'not_found', err.content);
+        done();
+      });
+    });
+
+    it('should keep responding with 404 with upstream response', function(done) {
+      var r = Resource.get('http://registry.npmjs.org/remote-nocache-404');
+
+      r.getReadablePath(function(err, data) {
+        assert.ok(err);
+        assert.ok(err.content);
+        assert.equal(JSON.parse(err.content).error, 'not_found', err.content);
+
+        var r2 = Resource.get('http://registry.npmjs.org/remote-nocache-404');
+
+        r2.getReadablePath(function(err, data) {
+          assert.ok(err);
+          assert.ok(err.content);
+          assert.equal(JSON.parse(err.content).error, 'not_found', err.content);
+          done();
+        });
       });
     });
 
@@ -398,18 +449,6 @@ describe('resource tests', function() {
         done();
       });
     });
-
-    it('if retries > maxRetries on 500, throw a error', function(done) {
-      var r = Resource.get('http://registry.npmjs.org/remote-500');
-
-      r.getReadablePath(function(err, data) {
-        assert.ok(err);
-        readStream(data, function(resp) {
-          assert.equal(JSON.parse(resp).error, 'remote-error');
-          done();
-        });
-      });
-    });
       
     describe('with granular control', function() {
 
@@ -462,6 +501,37 @@ describe('resource tests', function() {
           assert.equal(read(data).trim(), 'remote-valid-tar');
           counter++;
           if (counter == 2) {
+            done();
+          }
+        }
+      });
+      
+      it('when the resource is already fetching, block all pending requests but still respond with errors', function(done) {
+        this.timeout(10000);
+        Resource.prototype._fetchTask = function(onDone) {
+          var u = this.url;
+          return setTimeout(function() {
+            return onDone(null, fakeResponse(remoteDir + '/' + getTargetBasename(u), 500));
+          }, 10);
+        };
+
+        var r = Resource.get('http://registry.npmjs.org/remote-500'),
+            r2 = Resource.get('http://registry.npmjs.org/remote-500'),
+            r3 = Resource.get('http://registry.npmjs.org/remote-500'),
+            r4 = Resource.get('http://registry.npmjs.org/remote-500'),
+            counter = 0;
+
+        r.getReadablePath(onDone);
+        r2.getReadablePath(onDone);
+        r3.getReadablePath(onDone);
+        r4.getReadablePath(onDone);
+
+        function onDone(err, data) {
+          assert.ok(err);
+          assert.equal(err.statusCode, 500);
+          assert.equal(JSON.parse(err.content).error, 'remote-error');
+          counter++;
+          if (counter == 4) {
             done();
           }
         }
