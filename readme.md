@@ -20,6 +20,13 @@ Here are all the ways in which npm_lazy is resilient to registry failures:
   - Metadata files must parse as JSON; if not, they are retried.
 - Metadata files are never discarded until a newer version can be fetched successfully. If the JSON metadata is older than `cacheAge` (default: 1 hour), we will attempt to contact the registry first. However, if contacting the registry fails, then the old version of the metadata is sent instead. This means that even when outages occur, you can install any package that has been installed at least once before.
 
+## New in version 1.7.x
+
+- introducing @CL0SeY as a co-maintainer / core contributor, and a solid set of improvements to the error handling in npm_lazy.
+- improved remote error handling (404's, 500's) for resources that are not in the cache (thanks @CL0SeY)
+  - 404's for are returned immediately (previously, npm_lazy returned a generic 500 error for 404's).
+  - for other errors are requests retried `maxRetries` times. The error response content and error status code are also now returned up from the registry to the npm_lazy clients.
+
 ## New in version 1.6.x
 
 - improved etags handling (thanks @CL0SeY)
