@@ -19,20 +19,6 @@ function read(fullpath) {
   return fs.readFileSync(fullpath).toString();
 }
 
-function readStream(stream, done) {
-  var resp = '';
-  if (!stream) {
-    done(null);
-    return;
-  }
-  stream.on('data', function(content) {
-    resp += content;
-  });
-  stream.on('end', function() {
-    done(resp);
-  });
-}
-
 describe('resource tests', function() {
   var cache,
       remoteDir,
