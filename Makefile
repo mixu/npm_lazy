@@ -4,13 +4,23 @@ TESTS += test/package.test.js
 TESTS += test/resource.test.js
 
 test:
-	# Why /usr/bin/env? Because I want stuff like nvm versions to take precedence
-	/usr/bin/env node ./node_modules/.bin/mocha \
-		--ui exports \
-		--reporter spec \
-		--slow 2000ms \
-		--bail \
-		$(TESTS)
+    ifeq ($(OS),Windows_NT)
+		# There is no /usr/bin/env on Windows.
+		node_modules\\.bin\\mocha.cmd \
+          --ui exports \
+          --reporter spec \
+          --slow 2000ms \
+          --bail \
+          $(TESTS)
+    else
+		# Why /usr/bin/env? Because I want stuff like nvm versions to take precedence
+		/usr/bin/env node ./node_modules/.bin/mocha \
+          --ui exports \
+          --reporter spec \
+          --slow 2000ms \
+          --bail \
+          $(TESTS)
+    endif
 
 lint:
 	jshint . --exclude="**/node_modules"
