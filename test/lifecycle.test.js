@@ -16,7 +16,7 @@ describe('given a lifecycle', function() {
   it('can block and release', function(done) {
     this.cycle.block('foo');
     assert.ok(this.cycle.isBlocking('foo'));
-    this.cycle.release(null, 'foo');
+    this.cycle.release('foo');
     assert.ok(!this.cycle.isBlocking('foo'));
     done();
   });
@@ -27,7 +27,7 @@ describe('given a lifecycle', function() {
     this.cycle.onRelease('foo', function() { assertions++; if (assertions == 3) { done(); } });
     this.cycle.onRelease('foo', function() { assertions++; if (assertions == 3) { done(); } });
     this.cycle.onRelease('foo', function() { assertions++; if (assertions == 3) { done(); } });
-    this.cycle.release(null, 'foo');
+    this.cycle.release('foo');
   });
 
 });
