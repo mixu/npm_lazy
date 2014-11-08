@@ -14,7 +14,6 @@
   "main": "./server.js",
   "dependencies": {
     "bytes": "1.0.0",
-    "daemon": "^1.1.0",
     "file-fixture": "0.0.1",
     "microee": "0.0.5",
     "minilog": "2.0.x",
