@@ -212,7 +212,7 @@ describe('resource tests', function() {
       var r = Resource.get('http://registry.npmjs.org/remote-valid');
 
       r.getReadablePath(function(err, data) {
-        assert.ok(!err);
+        assert.ok(!err, err);
         assert.equal(JSON.parse(read(data)).name, 'remote-valid');
         done();
       });
@@ -224,7 +224,7 @@ describe('resource tests', function() {
       r.getReadablePath(function(err, data) {
         console.log('err: ', err);
         console.log('data: ', data);
-        assert.ok(!err);
+        assert.ok(!err, err);
         assert.equal(JSON.parse(read(data)).name, 'remote-retry');
         done();
       });
@@ -256,7 +256,7 @@ describe('resource tests', function() {
 
       r.isUpToDate = function() { return false; };
       r.getReadablePath(function(err, data) {
-        assert.ok(!err);
+        assert.ok(!err, err);
         assert.equal(JSON.parse(read(data)).name, 'uptodate');
         done();
       });
@@ -267,7 +267,7 @@ describe('resource tests', function() {
 
       r.isUpToDate = function() { return false; };
       r.getReadablePath(function(err, data) {
-        assert.ok(!err);
+        assert.ok(!err, err);
         assert.equal(JSON.parse(read(data)).name, 'outdated-fail');
         done();
       });
@@ -342,7 +342,7 @@ describe('resource tests', function() {
         });
 
         r.getReadablePath(function(err, data) {
-          assert.ok(!err);
+          assert.ok(!err, err);
           assert.ok(errors.length > 0);
           assert.equal(JSON.parse(read(data)).name, 'local-cached');
           done();
@@ -400,7 +400,7 @@ describe('resource tests', function() {
       var r = Resource.get('http://registry.npmjs.org/remote-cached/-/remote-cached.tgz');
 
       r.getReadablePath(function(err, data) {
-        assert.ok(!err);
+        assert.ok(!err, err);
         assert.equal(read(data), 'remote-cached-tar');
         done();
       });
@@ -410,7 +410,7 @@ describe('resource tests', function() {
       var r = Resource.get('http://registry.npmjs.org/remote-valid/-/remote-valid.tgz');
 
       r.getReadablePath(function(err, data) {
-        assert.ok(!err);
+        assert.ok(!err, err);
         assert.equal(read(data).trim(), 'remote-valid-tar');
         done();
       });
@@ -420,7 +420,7 @@ describe('resource tests', function() {
       var r = Resource.get('http://registry.npmjs.org/remote-retry-3/-/remote-retry-3.tgz');
 
       r.getReadablePath(function(err, data) {
-        assert.ok(!err);
+        assert.ok(!err, err);
         assert.equal(read(data).trim(), 'remote-retry-valid-tar');
         done();
       });
@@ -483,7 +483,7 @@ describe('resource tests', function() {
         r2.getReadablePath(onDone);
 
         function onDone(err, data) {
-          assert.ok(!err);
+          assert.ok(!err, err);
           assert.equal(read(data).trim(), 'remote-valid-tar');
           counter++;
           if (counter == 2) {
