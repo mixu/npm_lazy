@@ -3,3 +3,4 @@
 db/
 test/tmp/*
 .settings
+.vscode
