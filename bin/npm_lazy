@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 var fs = require('fs'),
     path = require('path'),
-    nodeResolve = require('resolve'),
     start = require('../server.js'),
     opts = require('yargs')
       .options({
@@ -38,7 +37,7 @@ var config = require('../config.js'),
     configPath = path.normalize(__dirname + '/../config.js');
 
 if (argv['config']){
-  configPath = nodeResolve.sync(argv.config, { basedir: process.cwd() });
+  configPath = require.resolve(path.resolve(argv.config));
   config = require(configPath);
 }
 
