@@ -100,23 +100,23 @@ A few things that might be useful to know:
 - Note that only package index metadata and package tarfiles are cached; all other endpoints are just a transparently proxied (e.g. you can always run `npm install` for cached packages but more exotic npm endpoints will not work if the registry is down; they will simply act like their non-npm_lazy equivalents).
 - Also, note that if you intend to write through npm_lazy you must set `cacheAge` to `0` so that npm metadata is always refreshed because npm wants to know that you have the most recent package `_id` before it allows writing. This will still return cached data for package.json indexes needed for installation if the registry is down, but only after attempting to contact the registry (this seems like a decent, but not perfect compromise).
 - Restarting npm_lazy will clear the package.json metadata refresh timeout and the max retries counter. All cached entries, including package.json files and tarfiles are kept, so you can safely restart the server to expire the metadata `cacheAge` while retaining all cached artifacts.
-- npm_lazy works by rewriting the download URLs for package.json results, so old files from `npm shrinkwrap` may interfere with it since they may contain direct references to registry.npmjs.org. Make sure you clean up that stuff.
+- npm_lazy works by rewriting the download URLs for package.json results, so old files from `npm shrinkwrap` may interfere with it since they may contain direct references to registry.npmjs.com. Make sure you clean up that stuff.
 - If you are using self-signed certs, set `rejectUnauthorized` to false in the config.
 
 ### Resiliency to registry failures
 
 First, install a package successfully so that it is cached.
 
-Next, to simulate a network failure, add `0.0.0.1 registry.npmjs.org` to `/etc/hosts` and try installing that same package again (in another folder). You should see something like this:
+Next, to simulate a network failure, add `0.0.0.1 registry.npmjs.com` to `/etc/hosts` and try installing that same package again (in another folder). You should see something like this:
 
     npm_lazy at localhost port 8080
     npm_lazy cache directory: /home/m/.npm_lazy
-    Fetch failed (1/5): http://registry.npmjs.org/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
-    Fetch failed (2/5): http://registry.npmjs.org/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
-    Fetch failed (3/5): http://registry.npmjs.org/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
-    Fetch failed (4/5): http://registry.npmjs.org/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
-    Fetch failed (5/5): http://registry.npmjs.org/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
-    [OK] Reusing cached result for http://registry.npmjs.org/socket.io
+    Fetch failed (1/5): http://registry.npmjs.com/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
+    Fetch failed (2/5): http://registry.npmjs.com/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
+    Fetch failed (3/5): http://registry.npmjs.com/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
+    Fetch failed (4/5): http://registry.npmjs.com/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
+    Fetch failed (5/5): http://registry.npmjs.com/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
+    [OK] Reusing cached result for http://registry.npmjs.com/socket.io
 
 ## Configuration
 
@@ -175,7 +175,7 @@ module.exports = {
   // external url to npm_lazy, no trailing /
   externalUrl: 'http://localhost:8080',
   // registry url with trailing /
-  remoteUrl: 'https://registry.npmjs.org/',
+  remoteUrl: 'https://registry.npmjs.com/',
   // bind port and host
   port: 8080,
   host: '0.0.0.0',
@@ -194,6 +194,6 @@ module.exports = {
 
 When a resource is requested:
 
-- Anything that we don't have locally gets fetched from registry.npmjs.org on demand.
+- Anything that we don't have locally gets fetched from registry.npmjs.com on demand.
 - Metadata is updated when the resource is requested the first time after a restart, and if the resource is requested an hour later (which is the max age for package metadata).
 

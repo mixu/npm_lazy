@@ -50,7 +50,7 @@ module.exports = {
   // external url to npm_lazy, no trailing /
   externalUrl: 'http://localhost:8080',
   // registry url with trailing /
-  remoteUrl: 'https://registry.npmjs.org/',
+  remoteUrl: 'https://registry.npmjs.com/',
   // bind port and host
   port: 8080,
   host: '0.0.0.0',

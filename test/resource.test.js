@@ -165,9 +165,9 @@ describe('resource tests', function() {
           remotename;
 
       if (path.extname(basename) === '.json') {
-        remotename = 'http://registry.npmjs.org/' + packagename;
+        remotename = 'http://registry.npmjs.com/' + packagename;
       } else {
-        remotename = 'http://registry.npmjs.org/' +
+        remotename = 'http://registry.npmjs.com/' +
           packagename + '/-/' + basename;
       }
 
@@ -193,13 +193,13 @@ describe('resource tests', function() {
   });
 
   it('.tgz get packagename', function() {
-    assert.equal(Resource.get('http://registry.npmjs.org/foo/-/foo-1.0.0.tgz').getPackageName(), 'foo');
+    assert.equal(Resource.get('http://registry.npmjs.com/foo/-/foo-1.0.0.tgz').getPackageName(), 'foo');
   });
 
   describe('index resource', function() {
 
     it('if it exists and is up to date, success', function(done) {
-      var r = Resource.get('http://registry.npmjs.org/local-cached');
+      var r = Resource.get('http://registry.npmjs.com/local-cached');
 
       r.getReadablePath(function(err, data) {
         assert.ok(!err, err);
@@ -209,7 +209,7 @@ describe('resource tests', function() {
     });
 
     it('if it does not exist and the response is a JSON object, success', function(done) {
-      var r = Resource.get('http://registry.npmjs.org/remote-valid');
+      var r = Resource.get('http://registry.npmjs.com/remote-valid');
 
       r.getReadablePath(function(err, data) {
         assert.ok(!err, err);
@@ -219,7 +219,7 @@ describe('resource tests', function() {
     });
 
     it('if it does not exist and the response is not a JSON object, retry', function(done) {
-      var r = Resource.get('http://registry.npmjs.org/remote-retry');
+      var r = Resource.get('http://registry.npmjs.com/remote-retry');
 
       r.getReadablePath(function(err, data) {
         console.log('err: ', err);
@@ -231,7 +231,7 @@ describe('resource tests', function() {
     });
 
     it('if retries > maxRetries, throw a error', function(done) {
-      var r = Resource.get('http://registry.npmjs.org/remote-invalid');
+      var r = Resource.get('http://registry.npmjs.com/remote-invalid');
 
       r.getReadablePath(function(err, data) {
         assert.ok(err);
@@ -241,7 +241,7 @@ describe('resource tests', function() {
     });
 
     it('if retries > maxRetries on 500, throw a error', function(done) {
-      var r = Resource.get('http://registry.npmjs.org/remote-503');
+      var r = Resource.get('http://registry.npmjs.com/remote-503');
 
       r.getReadablePath(function(err, data) {
         assert.ok(err);
@@ -252,7 +252,7 @@ describe('resource tests', function() {
     });
 
     it('if the resource exists but is outdated, fetch a new version and return it', function(done) {
-      var r = Resource.get('http://registry.npmjs.org/local-outdated');
+      var r = Resource.get('http://registry.npmjs.com/local-outdated');
 
       r.isUpToDate = function() { return false; };
       r.getReadablePath(function(err, data) {
@@ -263,7 +263,7 @@ describe('resource tests', function() {
     });
 
     it('if the resource is outdated and the fetch fails, return the cached version', function(done) {
-      var r = Resource.get('http://registry.npmjs.org/local-outdated-fail');
+      var r = Resource.get('http://registry.npmjs.com/local-outdated-fail');
 
       r.isUpToDate = function() { return false; };
       r.getReadablePath(function(err, data) {
@@ -274,7 +274,7 @@ describe('resource tests', function() {
     });
 
     it('if the resource is outdated and the fetch responds with error 500, return the cached version', function(done) {
-      var r = Resource.get('http://registry.npmjs.org/local-outdated-fail-500');
+      var r = Resource.get('http://registry.npmjs.com/local-outdated-fail-500');
 
       r.isUpToDate = function() { return false; };
       r.getReadablePath(function(err, data) {
@@ -285,7 +285,7 @@ describe('resource tests', function() {
     });
 
     it('should respond with 404 with upstream response', function(done) {
-      var r = Resource.get('http://registry.npmjs.org/remote-404');
+      var r = Resource.get('http://registry.npmjs.com/remote-404');
 
       r.getReadablePath(function(err, data) {
         assert.ok(err);
@@ -296,14 +296,14 @@ describe('resource tests', function() {
     });
 
     it('should keep responding with 404 with upstream response', function(done) {
-      var r = Resource.get('http://registry.npmjs.org/remote-nocache-404');
+      var r = Resource.get('http://registry.npmjs.com/remote-nocache-404');
 
       r.getReadablePath(function(err, data) {
         assert.ok(err);
         assert.ok(err.content);
         assert.equal(JSON.parse(err.content).error, 'not_found', err.content);
 
-        var r2 = Resource.get('http://registry.npmjs.org/remote-nocache-404');
+        var r2 = Resource.get('http://registry.npmjs.com/remote-nocache-404');
 
         r2.getReadablePath(function(err, data) {
           assert.ok(err);
@@ -333,7 +333,7 @@ describe('resource tests', function() {
 
       it('if the fetch times out, use the cached version', function(done) {
         this.timeout(10000);
-        var r = Resource.get('http://registry.npmjs.org/local-cached'),
+        var r = Resource.get('http://registry.npmjs.com/local-cached'),
             errors = [];
 
         r.on('fetch-error', function(err) {
@@ -351,7 +351,7 @@ describe('resource tests', function() {
 
       it('if the fetch times out, and the object is not cached, throw', function(done) {
         this.timeout(10000);
-        var r = Resource.get('http://registry.npmjs.org/local-missing'),
+        var r = Resource.get('http://registry.npmjs.com/local-missing'),
             errors = [];
 
         r.on('fetch-error', function(err) {
@@ -375,8 +375,8 @@ describe('resource tests', function() {
           }, 50);
         };
 
-        var r = Resource.get('http://registry.npmjs.org/remote-valid'),
-            r2 = Resource.get('http://registry.npmjs.org/remote-valid'),
+        var r = Resource.get('http://registry.npmjs.com/remote-valid'),
+            r2 = Resource.get('http://registry.npmjs.com/remote-valid'),
             counter = 0;
 
         r.getReadablePath(onDone);
@@ -397,7 +397,7 @@ describe('resource tests', function() {
   describe('tar resource', function() {
 
     it('if it exists, success', function(done) {
-      var r = Resource.get('http://registry.npmjs.org/remote-cached/-/remote-cached.tgz');
+      var r = Resource.get('http://registry.npmjs.com/remote-cached/-/remote-cached.tgz');
 
       r.getReadablePath(function(err, data) {
         assert.ok(!err, err);
@@ -407,7 +407,7 @@ describe('resource tests', function() {
     });
 
     it('when the response passes checksum, success', function(done) {
-      var r = Resource.get('http://registry.npmjs.org/remote-valid/-/remote-valid.tgz');
+      var r = Resource.get('http://registry.npmjs.com/remote-valid/-/remote-valid.tgz');
 
       r.getReadablePath(function(err, data) {
         assert.ok(!err, err);
@@ -417,7 +417,7 @@ describe('resource tests', function() {
     });
 
     it('when the response fails checksum, retry', function(done) {
-      var r = Resource.get('http://registry.npmjs.org/remote-retry-3/-/remote-retry-3.tgz');
+      var r = Resource.get('http://registry.npmjs.com/remote-retry-3/-/remote-retry-3.tgz');
 
       r.getReadablePath(function(err, data) {
         assert.ok(!err, err);
@@ -427,7 +427,7 @@ describe('resource tests', function() {
     });
 
     it('if retries > maxRetries, throw a error', function(done) {
-      var r = Resource.get('http://registry.npmjs.org/remote-retries/-/remote-retries.tgz');
+      var r = Resource.get('http://registry.npmjs.com/remote-retries/-/remote-retries.tgz');
 
       r.getReadablePath(function(err, data) {
         assert.ok(err);
@@ -451,7 +451,7 @@ describe('resource tests', function() {
 
       it('if the fetch times out, and the object is not cached, throw', function(done) {
         this.timeout(10000);
-        var r = Resource.get('http://registry.npmjs.org/remote-missing/-/remote-missing.tgz'),
+        var r = Resource.get('http://registry.npmjs.com/remote-missing/-/remote-missing.tgz'),
             errors = [];
 
         r.on('fetch-error', function(err) {
@@ -475,8 +475,8 @@ describe('resource tests', function() {
           }, 50);
         };
 
-        var r = Resource.get('http://registry.npmjs.org/remote-valid2/-/remote-valid2.tgz'),
-            r2 = Resource.get('http://registry.npmjs.org/remote-valid2/-/remote-valid2.tgz'),
+        var r = Resource.get('http://registry.npmjs.com/remote-valid2/-/remote-valid2.tgz'),
+            r2 = Resource.get('http://registry.npmjs.com/remote-valid2/-/remote-valid2.tgz'),
             counter = 0;
 
         r.getReadablePath(onDone);
@@ -501,10 +501,10 @@ describe('resource tests', function() {
           }, 10);
         };
 
-        var r = Resource.get('http://registry.npmjs.org/remote-500'),
-            r2 = Resource.get('http://registry.npmjs.org/remote-500'),
-            r3 = Resource.get('http://registry.npmjs.org/remote-500'),
-            r4 = Resource.get('http://registry.npmjs.org/remote-500'),
+        var r = Resource.get('http://registry.npmjs.com/remote-500'),
+            r2 = Resource.get('http://registry.npmjs.com/remote-500'),
+            r3 = Resource.get('http://registry.npmjs.com/remote-500'),
+            r4 = Resource.get('http://registry.npmjs.com/remote-500'),
             counter = 0;
 
         r.getReadablePath(onDone);
