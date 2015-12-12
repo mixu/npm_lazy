@@ -197,5 +197,5 @@ module.exports = {
 When a resource is requested:
 
 - Anything that we don't have locally gets fetched from registry.npmjs.com on demand.
-- Metadata is updated when the resource is requested the first time after a restart, and if the resource is requested an hour later (which is the max age for package metadata).
+- Metadata is updated when the resource is requested the first time after a restart, and if the resource is requested later than the max age set in configuration (which is currently set to 0. Set the max age for package metadata in the config.js file to override this).
 
