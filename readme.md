@@ -54,6 +54,8 @@ Check out the [changelog](changelog.md) for version history.
 
 ## Installation
 
+_Requires node >= 0.10.x_
+
 v1.1.x adds a command called `npm_lazy` to make things even easier. Install via npm:
 
     sudo npm install -g npm_lazy
