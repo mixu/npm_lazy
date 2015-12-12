@@ -75,7 +75,7 @@ describe('given a server', function() {
   describe('self-signed', function() {
     before(function() {
       // Note: this test depends on the fact that isaacs.iriscouch.com/ exists
-      // and that it keeps serving the cert for registry.npmjs.org which
+      // and that it keeps serving the cert for registry.npmjs.com which
       // obviously fails validation
 
       // Note that this test seems to always pass in Node v0.8.x but works correctly in 0.10.x
@@ -93,7 +93,7 @@ describe('given a server', function() {
         rejectUnauthorized: true
       });
       Package.configure({
-        remoteUrl: 'http://registry.npmjs.org/'
+        remoteUrl: 'http://registry.npmjs.com/'
       });
     });
 
