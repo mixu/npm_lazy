@@ -20,6 +20,10 @@ Here are all the ways in which npm_lazy is resilient to registry failures:
   - Metadata files must parse as JSON; if not, they are retried.
 - Metadata files are never discarded until a newer version can be fetched successfully. If the JSON metadata is older than `cacheAge` (default: 1 hour), we will attempt to contact the registry first. However, if contacting the registry fails, then the old version of the metadata is sent instead. This means that even when outages occur, you can install any package that has been installed at least once before.
 
+## New in version 1.9.x
+
+- Added port, host, remote-url and external-url CLI command configurations (#47, thanks @albertosouza)
+
 ## New in version 1.8.x
 
 - Better handling of npm private modules (#52, thanks @CL0SeY)
@@ -45,14 +49,6 @@ Here are all the ways in which npm_lazy is resilient to registry failures:
 Added support for using a http proxy (note: not a [Socks5](http://en.wikipedia.org/wiki/SOCKS) proxy). This can be configured either via the config file or via the `http_proxy` environment variable, see the config at the end for an example. Thanks @migounette! As I am not using a proxy myself, please report any issues via GH (pull requests welcome!).
 
 Note: if you already have a proxy for npm, make sure you don't run into an issue where npm uses the proxy when accessing npm_lazy. You don't want to have `npm install -> proxy -> npm_lazy -> proxy`, but rather `npm install -> npm_lazy -> proxy` since your proxy probably doesn't know how to connect to npm_lazy. You will need to disable npm's internal proxy config, [see this comment for the details](https://github.com/mixu/npm_lazy/issues/30#issuecomment-39546977).
-
-## New in version 1.4.x
-
-Bug fixes and improvements:
-
-- Fixed a bug with garbage collecting `package.json` files.
-- Fixed a bug which occurred when the package file on the registry was updated by the author without bumping the version, resulting in a checksum mismatch between the cached tarfile and the metadata. Thanks @univerio!
-- Added support for logging to file (`loggingOpts`). Thanks @Damiya!
 
 Check out the [changelog](changelog.md) for version history.
 
