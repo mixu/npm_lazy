@@ -6,6 +6,10 @@ var fs = require('fs'),
       .options({
         'config': { alias: 'c' },
         'help': { alias: 'h' },
+        'port': { alias: 'p' },
+        'host': { alias: 'H' },
+        'external-url': { alias: 'e' },
+        'remote-url': { alias: 'r' },
         'init': { },
         'show-config': { },
         'version': { }
@@ -39,6 +43,22 @@ var config = require('../config.js'),
 if (argv['config']){
   configPath = require.resolve(path.resolve(argv.config));
   config = require(configPath);
+}
+
+if (argv.port) {
+  config.port = argv.port;
+}
+
+if (argv.host) {
+  config.host = argv.host;
+}
+
+if (argv['external-url']) {
+  config.externalUrl = argv['external-url'];
+}
+
+if (argv['remote-url']) {
+  config.remoteUrl = argv['remote-url'];
 }
 
 if (argv['show-config']) {

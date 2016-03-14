@@ -8,3 +8,7 @@ Options:
   --show-config         Show the loaded configuration during startup
   -v, --version         Show version
   -h, --help            Show help
+  -p, --port            Port configuration
+  -H, --host            Host configuration
+  -e, --external-url    External url configuration
+  -r, --remote-url      Remote url configuration
