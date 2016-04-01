@@ -67,6 +67,9 @@ function start(config) {
   var server = http.createServer();
 
   server.on('request', function(req, res) {
+    if (config.loggingOpts.logRequesterIP) {
+      log.info("Request from ip: "+req.connection.remoteAddress+ " for "+req.url);
+    }
     if (!api.route(req, res)) {
       log.error('No route found', req.url);
       Package.proxy(req, res);
