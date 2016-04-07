@@ -131,6 +131,9 @@ var path = require('path'),
 module.exports = {
   // Logging config
   loggingOpts: {
+
+    // show the ip address of the machine requesting the npm package
+    logRequesterIP: true,
     // Print to stdout with colors
     logToConsole: true,
     // Write to file
