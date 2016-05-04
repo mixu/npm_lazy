@@ -194,6 +194,7 @@ describe('resource tests', function() {
 
   it('.tgz get packagename', function() {
     assert.equal(Resource.get('http://registry.npmjs.com/foo/-/foo-1.0.0.tgz').getPackageName(), 'foo');
+    assert.equal(Resource.get('http://registry.npmjs.com/@angular/common/-/common-1.0.0.tgz').getPackageName(), '@angular%2fcommon');
   });
 
   describe('index resource', function() {
@@ -435,7 +436,7 @@ describe('resource tests', function() {
         done();
       });
     });
-      
+
     describe('with granular control', function() {
 
       before(function() {
@@ -491,7 +492,7 @@ describe('resource tests', function() {
           }
         }
       });
-      
+
       it('when the resource is already fetching, block all pending requests but still respond with errors', function(done) {
         this.timeout(10000);
         Resource.prototype._fetchTask = function(onDone) {

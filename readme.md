@@ -20,6 +20,10 @@ Here are all the ways in which npm_lazy is resilient to registry failures:
   - Metadata files must parse as JSON; if not, they are retried.
 - Metadata files are never discarded until a newer version can be fetched successfully. If the JSON metadata is older than `cacheAge` (default: 1 hour), we will attempt to contact the registry first. However, if contacting the registry fails, then the old version of the metadata is sent instead. This means that even when outages occur, you can install any package that has been installed at least once before.
 
+## New in version 1.10.x
+
+- Added support for scoped packages.
+
 ## New in version 1.9.x
 
 - Added port, host, remote-url and external-url CLI command configurations (#47, thanks @albertosouza)
@@ -71,6 +75,8 @@ To edit the configuration, start by initializing a file from the default config 
 To start the server with a custom configuration:
 
     npm_lazy --config ~/npm_lazy.config.js
+
+Make sure you also empty out any npm caches by running `npm cache clean`, as npm does its own local caching, which means that some files might still point directly to the registry rather than to the npm_lazy endpoints.
 
 ## Installation by cloning the repo
 
