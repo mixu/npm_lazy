@@ -26,10 +26,11 @@ describe('given a package', function() {
 
   it('can fetch a package index', function(done) {
     this.timeout(10000);
+    var auth = null;
 
     // Note: this goes out the the real reg!
 
-    Package.getIndex('foo', function(err, actual) {
+    Package.getIndex('foo', auth, function(err, actual) {
       var expected = JSON.parse(
         fs.readFileSync(__dirname + '/db/foo.json')
         .toString().replace('http://registry.npmjs.com/foo', 'http://localhost:8080/foo')
