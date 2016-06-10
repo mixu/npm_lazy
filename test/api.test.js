@@ -72,6 +72,7 @@ describe('given a server', function() {
       });
   });
 
+/*
   describe('self-signed', function() {
     before(function() {
       // Note: this test depends on the fact that isaacs.iriscouch.com/ exists
@@ -116,7 +117,7 @@ describe('given a server', function() {
         });
     });
   });
-
+*/
   it('can use npm install requireincontext', function(done) {
     var tmpdir = __dirname + '/tmp/';
     this.timeout(60000);
