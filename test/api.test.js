@@ -27,6 +27,8 @@ describe('given a server', function() {
       externalUrl: 'http://localhost:9090'
     });
 
+    api.configure({});
+
     http.createServer(function(req, res) {
       api.route(req, res);
     }).listen(9090, 'localhost', function() {
