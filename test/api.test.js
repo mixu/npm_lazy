@@ -94,7 +94,7 @@ describe('given a server', function() {
         rejectUnauthorized: true
       });
       Package.configure({
-        remoteUrl: 'http://registry.npmjs.com/'
+        remoteUrl: 'https://registry.npmjs.com/'
       });
     });
 

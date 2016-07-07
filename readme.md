@@ -123,12 +123,12 @@ Next, to simulate a network failure, add `0.0.0.1 registry.npmjs.com` to `/etc/h
 
     npm_lazy at localhost port 8080
     npm_lazy cache directory: /home/m/.npm_lazy
-    Fetch failed (1/5): http://registry.npmjs.com/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
-    Fetch failed (2/5): http://registry.npmjs.com/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
-    Fetch failed (3/5): http://registry.npmjs.com/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
-    Fetch failed (4/5): http://registry.npmjs.com/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
-    Fetch failed (5/5): http://registry.npmjs.com/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
-    [OK] Reusing cached result for http://registry.npmjs.com/socket.io
+    Fetch failed (1/5): https://registry.npmjs.com/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
+    Fetch failed (2/5): https://registry.npmjs.com/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
+    Fetch failed (3/5): https://registry.npmjs.com/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
+    Fetch failed (4/5): https://registry.npmjs.com/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
+    Fetch failed (5/5): https://registry.npmjs.com/socket.io { [Error: connect EINVAL] code: 'EINVAL', errno: 'EINVAL', syscall: 'connect' }
+    [OK] Reusing cached result for https://registry.npmjs.com/socket.io
 
 ## Configuration
 
