@@ -20,6 +20,10 @@ Here are all the ways in which npm_lazy is resilient to registry failures:
   - Metadata files must parse as JSON; if not, they are retried.
 - Metadata files are never discarded until a newer version can be fetched successfully. If the JSON metadata is older than `cacheAge` (default: 1 hour), we will attempt to contact the registry first. However, if contacting the registry fails, then the old version of the metadata is sent instead. This means that even when outages occur, you can install any package that has been installed at least once before.
 
+## New in version 1.13.x
+
+- Updated package.json dependencies
+
 ## New in version 1.12.x
 
 - The NPM registry now uses https for all connections, updated all internals and defaults to use https. Thanks @DanielDent!
