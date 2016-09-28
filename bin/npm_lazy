@@ -4,15 +4,15 @@ var fs = require('fs'),
     start = require('../server.js'),
     opts = require('yargs')
       .options({
-        'config': { alias: 'c' },
-        'help': { alias: 'h' },
+        'config': { alias: 'c', type: 'string' },
+        'help': { alias: 'h', type: 'boolean' },
         'port': { alias: 'p' },
-        'host': { alias: 'H' },
-        'external-url': { alias: 'e' },
-        'remote-url': { alias: 'r' },
-        'init': { },
-        'show-config': { },
-        'version': { }
+        'host': { alias: 'H', type: 'string' },
+        'external-url': { alias: 'e', type: 'string' },
+        'remote-url': { alias: 'r', type: 'string' },
+        'init': { type: 'boolean' },
+        'show-config': { type: 'boolean' },
+        'version': { type: 'boolean' }
       }),
     argv = opts.parse(process.argv);
 
