@@ -16,11 +16,11 @@
     "bytes": "~2.4.0",
     "file-fixture": "0.0.2",
     "microee": "0.0.6",
-    "minilog": "~3.0.1",
+    "minilog": "~3.1.0",
     "mixu_minimal": "0.0.1",
     "mkdirp": "~0.5.1",
-    "request": "~2.75.0",
-    "yargs": "~5.0.0"
+    "request": "~2.79.0",
+    "yargs": "~6.6.0"
   },
   "repository": {
     "type": "git",
