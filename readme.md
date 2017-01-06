@@ -1,5 +1,7 @@
 # npm_lazy
 
+[![Known Vulnerabilities](https://snyk.io/test/github/mixu/npm_lazy/818144c346c43ff59440de9fe70347828dcf706e/badge.svg)](https://snyk.io/test/github/mixu/npm_lazy/818144c346c43ff59440de9fe70347828dcf706e)
+
 A lazy local cache for npm
 
 ### Why?
