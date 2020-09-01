@@ -13,14 +13,14 @@
   ],
   "main": "./server.js",
   "dependencies": {
-    "bytes": "~2.4.0",
+    "bytes": "~3.1.0",
     "file-fixture": "0.0.2",
     "microee": "0.0.6",
     "minilog": "~3.1.0",
     "mixu_minimal": "0.0.1",
-    "mkdirp": "~0.5.1",
-    "request": "~2.79.0",
-    "yargs": "~6.6.0"
+    "mkdirp": "~1.0.4",
+    "request": "~2.88.2",
+    "yargs": "~15.4.1"
   },
   "repository": {
     "type": "git",
