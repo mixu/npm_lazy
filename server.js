@@ -76,6 +76,21 @@ function start(config) {
     }
   }).listen(config.port, config.host);
 
+  process.on('SIGTERM', () => {
+    log.info('SIGTERM signal received.');
+    log.log('Closing http server.');
+    server.close(() => {
+      log.log('Http server closed.');
+    });
+  });
+  process.on('SIGINT', () => {
+    log.info('SIGINT signal received.');
+    log.log('Closing http server.');
+    server.close(() => {
+      log.log('Http server closed.');
+    });
+  });
+
   log.info('npm_lazy at', config.host, 'port', config.port);
   log.info('npm_lazy cache directory:', path.normalize(config.cacheDirectory));
 
